@@ -1,18 +1,68 @@
 <h1 appHighlight>Students</h1>
 
-<form [formGroup]="studentForm" class="w-50" (ngSubmit)="onSubmit()">
+<form [formGroup]="studentForm" class="w-100" (ngSubmit)="onSubmit()">
+  <mat-chip-set
+    *ngIf="isEditingId"
+    [attr.aria-label]="'Editing student with ID ' + isEditingId"
+    role="status"
+    aria-live="polite"
+  >
+    <mat-chip>Editing student with ID: {{ isEditingId }}</mat-chip>
+  </mat-chip-set>
   <div class="row">
-    <div class="col-6">
+    <div class="col-4">
       <mat-form-field class="w-100">
-        <mat-label>Name</mat-label>
-        <input formControlName="firstName" matInput class="w-100"
-      /></mat-form-field>
+        <mat-label>First Name</mat-label>
+        <input formControlName="firstName" matInput class="w-100" />
+        <small
+          *ngIf="
+            firstName?.hasError('required') && firstName?.touched && submitted
+          "
+        >
+          First name is required
+        </small>
+        <small
+          *ngIf="
+            firstName?.hasError('minlength') && firstName?.touched && submitted
+          "
+        >
+          Minimum 2 characters
+        </small></mat-form-field
+      >
     </div>
-    <div class="col-6">
+    <div class="col-4">
+      <mat-form-field class="w-100">
+        <mat-label>Last Name</mat-label>
+        <input formControlName="lastName" matInput class="w-100" />
+        <small
+          *ngIf="
+            lastName?.hasError('required') && lastName?.touched && submitted
+          "
+        >
+          Last name is required
+        </small>
+        <small
+          *ngIf="
+            lastName?.hasError('minlength') && lastName?.touched && submitted
+          "
+        >
+          Minimum 2 characters
+        </small></mat-form-field
+      >
+    </div>
+    <div class="col-4">
       <mat-form-field class="w-100">
         <mat-label>Email</mat-label>
-        <input formControlName="email" matInput class="w-100"
-      /></mat-form-field>
+        <input formControlName="email" matInput class="w-100" />
+        <small
+          *ngIf="email?.hasError('required') && email?.touched && submitted"
+        >
+          Email is required
+        </small>
+        <small *ngIf="email?.hasError('email') && email?.touched && submitted">
+          Invalid email format
+        </small></mat-form-field
+      >
     </div>
     <div class="col-12 d-flex justify-content-end mt-3">
       <button mat-flat-button type="submit">Save</button>

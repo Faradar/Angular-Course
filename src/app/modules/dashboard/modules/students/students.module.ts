@@ -12,9 +12,15 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { StudentFullNamePipe } from './pipes/student-full-name.pipe';
 import { HighlightDirective } from './directives/highlight.directive';
+import { MatChipsModule } from '@angular/material/chips';
 
 @NgModule({
-  declarations: [StudentsComponent, StudentsTableComponent, StudentFullNamePipe, HighlightDirective],
+  declarations: [
+    StudentsComponent,
+    StudentsTableComponent,
+    StudentFullNamePipe,
+    HighlightDirective,
+  ],
   imports: [
     CommonModule,
     StudentsRoutingModule,
@@ -24,6 +30,7 @@ import { HighlightDirective } from './directives/highlight.directive';
     MatButtonModule,
     ReactiveFormsModule,
     MatIconModule,
+    MatChipsModule,
   ],
   exports: [StudentsComponent],
 })

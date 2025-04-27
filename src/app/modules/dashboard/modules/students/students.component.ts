@@ -1,16 +1,28 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ErrorStateMatcher } from '@angular/material/core';
 import { Student } from '../../../../models';
+import { SubmitErrorStateMatcher } from '../../../../errors';
 
 @Component({
   selector: 'app-students',
   standalone: false,
   templateUrl: './students.component.html',
   styleUrl: './students.component.scss',
+  providers: [
+    {
+      // only paint error after submit has been attempted
+      provide: ErrorStateMatcher,
+      useFactory: (cmp: StudentsComponent) =>
+        new SubmitErrorStateMatcher(() => cmp.submitted),
+      deps: [StudentsComponent],
+    },
+  ],
 })
 export class StudentsComponent {
   isEditingId: number | null = null;
   studentForm: FormGroup;
+  submitted = false;
 
   students: Student[] = [
     {
@@ -77,12 +89,29 @@ export class StudentsComponent {
 
   constructor(private fb: FormBuilder) {
     this.studentForm = this.fb.group({
-      firstName: [''],
-      email: [''],
+      firstName: ['', [Validators.required, Validators.minLength(2)]],
+      lastName: ['', [Validators.required, Validators.minLength(2)]],
+      email: ['', [Validators.required, Validators.email]],
     });
   }
 
+  get firstName() {
+    return this.studentForm.get('firstName');
+  }
+  get lastName() {
+    return this.studentForm.get('lastName');
+  }
+  get email() {
+    return this.studentForm.get('email');
+  }
+
   onSubmit() {
+    this.submitted = true;
+    if (this.studentForm.invalid) {
+      this.studentForm.markAllAsTouched();
+      return;
+    }
+
     if (this.isEditingId) {
       this.students = this.students.map((student) =>
         student.id === this.isEditingId
@@ -93,12 +122,12 @@ export class StudentsComponent {
       const newStudent = this.studentForm.value;
       newStudent.id = this.students.length + 1;
 
-      console.log('newStudent', newStudent);
-
       this.students = [...this.students, newStudent];
     }
-    this.studentForm.reset();
+
     this.isEditingId = null;
+    this.studentForm.reset();
+    this.submitted = false;
   }
 
   onEditStudent(student: Student) {

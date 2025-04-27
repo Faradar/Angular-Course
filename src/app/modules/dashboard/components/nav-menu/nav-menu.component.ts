@@ -9,8 +9,8 @@ import { Link } from '../../../../models';
 })
 export class NavMenuComponent {
   list: Link[] = [
-    { id: 1, label: 'Home', url: '/home', isActive: true },
-    { id: 2, label: 'Students', url: '/students', isActive: false },
+    { id: 1, label: 'Home', url: '/home', isActive: false },
+    { id: 2, label: 'Students', url: '/students', isActive: true },
     { id: 3, label: 'Logout', url: '/logout', isActive: false },
   ];
 
