@@ -1,0 +1,27 @@
+<h1 appHighlight>Students</h1>
+
+<form [formGroup]="studentForm" class="w-50" (ngSubmit)="onSubmit()">
+  <div class="row">
+    <div class="col-6">
+      <mat-form-field class="w-100">
+        <mat-label>Name</mat-label>
+        <input formControlName="firstName" matInput class="w-100"
+      /></mat-form-field>
+    </div>
+    <div class="col-6">
+      <mat-form-field class="w-100">
+        <mat-label>Email</mat-label>
+        <input formControlName="email" matInput class="w-100"
+      /></mat-form-field>
+    </div>
+    <div class="col-12 d-flex justify-content-end mt-3">
+      <button mat-flat-button type="submit">Save</button>
+    </div>
+  </div>
+</form>
+
+<app-students-table
+  (editStudent)="onEditStudent($event)"
+  (deleteStudent)="onDeleteStudent($event)"
+  [dataSource]="students"
+/>

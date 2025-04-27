@@ -1,0 +1,10 @@
+<mat-nav-list>
+  <a
+    mat-list-item
+    *ngFor="let link of list; trackBy: trackByLink"
+    [href]="link.url"
+    [activated]="link.isActive"
+  >
+    {{ link.label }}
+  </a>
+</mat-nav-list>
