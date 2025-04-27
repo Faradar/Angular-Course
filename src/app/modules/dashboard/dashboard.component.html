@@ -1,42 +1,44 @@
-<!-- NAVBAR -->
-<mat-toolbar>
-  <button
-    (click)="drawer.toggle()"
-    mat-icon-button
-    class="example-icon"
-    aria-label="Example icon-button with menu icon"
-  >
-    <mat-icon>menu</mat-icon>
-  </button>
-  <span>My App</span>
-  <span class="example-spacer"></span>
-  <button
-    mat-icon-button
-    class="example-icon favorite-icon"
-    aria-label="Example icon-button with heart icon"
-  >
-    <mat-icon>favorite</mat-icon>
-  </button>
-  <button
-    mat-icon-button
-    class="example-icon"
-    aria-label="Example icon-button with share icon"
-  >
-    <mat-icon>share</mat-icon>
-  </button>
-</mat-toolbar>
+<div class="dashboard-root">
+  <!-- NAVBAR -->
+  <mat-toolbar>
+    <button
+      (click)="drawer.toggle()"
+      mat-icon-button
+      class="example-icon"
+      aria-label="Example icon-button with menu icon"
+    >
+      <mat-icon>menu</mat-icon>
+    </button>
+    <span>My App</span>
+    <span class="example-spacer"></span>
+    <button
+      mat-icon-button
+      class="example-icon favorite-icon"
+      aria-label="Example icon-button with heart icon"
+    >
+      <mat-icon>favorite</mat-icon>
+    </button>
+    <button
+      mat-icon-button
+      class="example-icon"
+      aria-label="Example icon-button with share icon"
+    >
+      <mat-icon>share</mat-icon>
+    </button>
+  </mat-toolbar>
 
-<!-- SIDENAV -->
-<mat-drawer-container class="example-container" autosize>
-  <!-- SIDE MENU -->
-  <mat-drawer #drawer class="example-sidenav" mode="side">
-    <app-nav-menu />
-  </mat-drawer>
-  <!-- SIDE MENU END -->
+  <!-- SIDENAV -->
+  <mat-drawer-container class="example-container" autosize>
+    <!-- SIDE MENU -->
+    <mat-drawer #drawer class="example-sidenav" mode="side">
+      <app-nav-menu />
+    </mat-drawer>
+    <!-- SIDE MENU END -->
 
-  <!-- MAIN CONTENT -->
-  <div class="example-sidenav-content">
-    <app-students />
-  </div>
-  <!-- MAIN CONTENT END -->
-</mat-drawer-container>
+    <!-- MAIN CONTENT -->
+    <div class="example-sidenav-content">
+      <app-students />
+    </div>
+    <!-- MAIN CONTENT END -->
+  </mat-drawer-container>
+</div>
