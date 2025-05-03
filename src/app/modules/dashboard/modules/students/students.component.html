@@ -14,54 +14,48 @@
       <mat-form-field class="w-100">
         <mat-label>First Name</mat-label>
         <input formControlName="firstName" matInput class="w-100" />
-        <small
-          *ngIf="
-            firstName?.hasError('required') && firstName?.touched && submitted
-          "
-        >
+        <mat-error *ngIf="firstName?.hasError('required') && submitted">
           First name is required
-        </small>
-        <small
-          *ngIf="
-            firstName?.hasError('minlength') && firstName?.touched && submitted
-          "
-        >
+        </mat-error>
+        <mat-error *ngIf="firstName?.hasError('minlength') && submitted">
           Minimum 2 characters
-        </small></mat-form-field
-      >
+        </mat-error>
+      </mat-form-field>
     </div>
     <div class="col-4">
       <mat-form-field class="w-100">
         <mat-label>Last Name</mat-label>
         <input formControlName="lastName" matInput class="w-100" />
-        <small
+        <mat-error
           *ngIf="
             lastName?.hasError('required') && lastName?.touched && submitted
           "
         >
           Last name is required
-        </small>
-        <small
+        </mat-error>
+        <mat-error
           *ngIf="
             lastName?.hasError('minlength') && lastName?.touched && submitted
           "
         >
           Minimum 2 characters
-        </small></mat-form-field
+        </mat-error></mat-form-field
       >
     </div>
     <div class="col-4">
       <mat-form-field class="w-100">
         <mat-label>Email</mat-label>
         <input formControlName="email" matInput class="w-100" />
-        <small
+        <mat-error
           *ngIf="email?.hasError('required') && email?.touched && submitted"
         >
           Email is required
-        </small>
-        <small *ngIf="email?.hasError('email') && email?.touched && submitted">
+        </mat-error>
+        <mat-error
+          *ngIf="email?.hasError('email') && email?.touched && submitted"
+        >
           Invalid email format
-        </small></mat-form-field
+        </mat-error></mat-form-field
       >
     </div>
     <div class="col-12 d-flex justify-content-end mt-3">
