@@ -1,0 +1,7 @@
+@if ((student | async)) {
+<ng-container *ngIf="student | async as student">
+  <h1>{{ student | studentFullName | titlecase }}</h1>
+</ng-container>
+} @else {
+<p>Student not found</p>
+}

@@ -7,6 +7,7 @@ import { StudentsTableComponent } from './components/students-table/students-tab
 import { StudentFullNamePipe } from './pipes/student-full-name.pipe';
 import { HighlightDirective } from './directives/highlight.directive';
 import { SharedModule } from '../../../../shared/shared.module';
+import { StudentDetailComponent } from './pages/student-detail/student-detail.component';
 
 @NgModule({
   declarations: [
@@ -14,6 +15,7 @@ import { SharedModule } from '../../../../shared/shared.module';
     StudentsTableComponent,
     StudentFullNamePipe,
     HighlightDirective,
+    StudentDetailComponent,
   ],
   imports: [CommonModule, StudentsRoutingModule, SharedModule],
   exports: [StudentsComponent],

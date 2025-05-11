@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Student } from '../../../../models';
-import { Observable } from 'rxjs';
+import { map, Observable, of } from 'rxjs';
 
 const MY_FAKE_DB: Student[] = [
   {
@@ -78,5 +78,11 @@ export class StudentsService {
     });
 
     return studentObservable;
+  }
+
+  getStudentById(id: number): Observable<Student | null> {
+    return of([...MY_FAKE_DB]).pipe(
+      map((students) => students.find((student) => student.id == id) || null)
+    );
   }
 }

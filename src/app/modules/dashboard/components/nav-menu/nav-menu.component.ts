@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { Link } from '../../../../models';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-nav-menu',
@@ -9,10 +10,15 @@ import { Link } from '../../../../models';
 })
 export class NavMenuComponent {
   list: Link[] = [
-    { id: 1, label: 'Home', url: '/home', isActive: false },
-    { id: 2, label: 'Students', url: '/students', isActive: true },
-    { id: 3, label: 'Logout', url: '/logout', isActive: false },
+    { id: 1, label: 'Students', url: 'students', isActive: false },
+    { id: 2, label: 'Courses', url: 'courses', isActive: false },
   ];
+
+  constructor(private router: Router) {}
+
+  logout() {
+    this.router.navigate(['/auth/login']);
+  }
 
   trackByLink(_idx: number, link: Link): number {
     return link.id;
