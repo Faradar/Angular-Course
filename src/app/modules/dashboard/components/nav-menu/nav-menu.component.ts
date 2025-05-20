@@ -12,6 +12,7 @@ export class NavMenuComponent {
   list: Link[] = [
     { id: 1, label: 'Students', url: 'students', isActive: false },
     { id: 2, label: 'Courses', url: 'courses', isActive: false },
+    { id: 3, label: 'Enrollments', url: 'enrollments', isActive: false },
   ];
 
   constructor(private router: Router) {}
