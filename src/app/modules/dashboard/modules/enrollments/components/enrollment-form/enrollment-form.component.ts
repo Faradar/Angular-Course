@@ -5,6 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { EnrollmentsService } from '../../enrollments.service';
 import { CoursesService } from '../../../courses/courses.service';
 import { StudentsService } from '../../../students/students.service';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-enrollment-form',
@@ -16,9 +17,15 @@ export class EnrollmentFormComponent implements OnInit {
   form!: FormGroup;
   editId: number | null = null;
   loading = false;
-  courses: Course[] = [];
+
   students: Student[] = [];
+  courses: Course[] = [];
+  enrollments: Enrollment[] = [];
+
   notFound = false;
+
+  /** remember the original course in edit mode **/
+  private originalCourseId: number | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -30,44 +37,61 @@ export class EnrollmentFormComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    // 1) build the form
     this.form = this.fb.group({
       studentId: [null, Validators.required],
       courseId: [null, Validators.required],
       enrollmentDate: [new Date(), Validators.required],
     });
 
-    // preload students & courses for <mat-select>
-    this.coursesSvc.getCourses().subscribe((data) => (this.courses = data));
-    this.studentsSvc.getStudents().subscribe((data) => (this.students = data));
+    // 2) load students, courses & enrollments in parallel
+    this.loading = true;
+    forkJoin({
+      students: this.studentsSvc.getStudents(),
+      courses: this.coursesSvc.getCourses(),
+      enrollments: this.svc.getEnrollments(),
+    }).subscribe(({ students, courses, enrollments }) => {
+      this.students = students;
+      this.courses = courses;
+      this.enrollments = enrollments;
+      this.loading = false;
 
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
-      this.editId = +id;
-      this.loadEnrollment(this.editId);
-    }
+      // 3) if we're editing, patch the form and capture originalCourseId
+      const idParam = this.route.snapshot.paramMap.get('id');
+      if (idParam) {
+        this.editId = +idParam;
+        const e = enrollments.find((x) => x.id === this.editId);
+        if (!e) {
+          this.notFound = true;
+          return;
+        }
+        this.originalCourseId = e.courseId;
+        this.form.patchValue({
+          studentId: e.studentId,
+          courseId: e.courseId,
+          enrollmentDate: new Date(e.enrollmentDate),
+        });
+      }
+    });
+
+    // 4) whenever the student changes, clear out the old course selection
+    this.form.get('studentId')!.valueChanges.subscribe(() => {
+      this.form.get('courseId')!.setValue(null);
+    });
   }
 
-  private loadEnrollment(id: number) {
-    this.loading = true;
-    this.svc.getEnrollments().subscribe({
-      next: (list) => {
-        const e = list.find((x) => x.id === id);
-        if (e) {
-          this.form.patchValue({
-            studentId: e.studentId,
-            courseId: e.courseId,
-            enrollmentDate: new Date(e.enrollmentDate),
-          });
-        } else {
-          this.notFound = true;
-        }
-        this.loading = false;
-      },
-      error: () => {
-        this.notFound = true;
-        this.loading = false;
-      },
-    });
+  /**
+   * Disable any course the current student is already enrolled in,
+   * except the originalCourseId when in edit mode.
+   */
+  isCourseDisabled(courseId: number): boolean {
+    const sid = this.form.get('studentId')?.value;
+    if (!sid) return false;
+
+    // otherwise disable if an enrollment exists for this student+course
+    return this.enrollments.some(
+      (e) => e.studentId === sid && e.courseId === courseId
+    );
   }
 
   onSubmit(): void {
@@ -75,22 +99,16 @@ export class EnrollmentFormComponent implements OnInit {
       this.form.markAllAsTouched();
       return;
     }
-
     const payload: Enrollment = {
       ...this.form.value,
       id: this.editId || 0,
     };
 
-    if (this.editId) {
-      payload.id = this.editId;
-      this.svc
-        .updateEnrollment(payload)
-        .subscribe(() => this.router.navigate(['/dashboard/enrollments']));
-    } else {
-      this.svc
-        .createEnrollment(payload)
-        .subscribe(() => this.router.navigate(['/dashboard/enrollments']));
-    }
+    const op$ = this.editId
+      ? this.svc.updateEnrollment(payload)
+      : this.svc.createEnrollment(payload);
+
+    op$.subscribe(() => this.router.navigate(['/dashboard/enrollments']));
   }
 
   onCancel(): void {

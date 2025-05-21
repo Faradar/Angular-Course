@@ -40,7 +40,11 @@
     <mat-form-field class="w-100">
       <mat-label>Course</mat-label>
       <mat-select formControlName="courseId">
-        <mat-option *ngFor="let c of courses" [value]="c.id">
+        <mat-option
+          *ngFor="let c of courses"
+          [value]="c.id"
+          [disabled]="isCourseDisabled(c.id)"
+        >
           {{ c.name }}
         </mat-option>
       </mat-select>
