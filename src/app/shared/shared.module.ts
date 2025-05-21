@@ -12,9 +12,13 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatListModule } from '@angular/material/list';
 import { MatTableModule } from '@angular/material/table';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { StudentFullNamePipe } from './pipes/student-full-name.pipe';
 
 @NgModule({
-  declarations: [],
+  declarations: [StudentFullNamePipe],
   imports: [CommonModule],
   exports: [
     MatFormFieldModule,
@@ -29,6 +33,10 @@ import { MatChipsModule } from '@angular/material/chips';
     MatListModule,
     MatTableModule,
     MatChipsModule,
+    MatProgressSpinnerModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    StudentFullNamePipe,
   ],
 })
 export class SharedModule {}

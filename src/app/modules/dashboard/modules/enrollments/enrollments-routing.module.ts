@@ -1,12 +1,12 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { EnrollmentsComponent } from './enrollments.component';
+import { ListEnrollmentsComponent } from './components/list-enrollments/list-enrollments.component';
+import { EnrollmentFormComponent } from './components/enrollment-form/enrollment-form.component';
 
 const routes: Routes = [
-  {
-    path: '',
-    component: EnrollmentsComponent,
-  },
+  { path: '', component: ListEnrollmentsComponent },
+  { path: 'new', component: EnrollmentFormComponent },
+  { path: 'edit/:id', component: EnrollmentFormComponent },
 ];
 
 @NgModule({

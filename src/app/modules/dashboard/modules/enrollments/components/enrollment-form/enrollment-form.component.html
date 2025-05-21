@@ -1,0 +1,75 @@
+<mat-toolbar color="primary">
+  <button mat-icon-button (click)="onCancel()">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+  <span>{{ editId ? "Edit Enrollment" : "New Enrollment" }}</span>
+</mat-toolbar>
+
+<div class="p-4">
+  <!-- Loading -->
+  <div class="d-flex justify-content-center" *ngIf="loading">
+    <mat-progress-spinner
+      diameter="40"
+      mode="indeterminate"
+    ></mat-progress-spinner>
+  </div>
+
+  <!-- Not Found -->
+  <p *ngIf="!loading && notFound" class="mat-body-1 mat-warn">
+    Enrollment not found.
+  </p>
+
+  <!-- Form -->
+  <form
+    *ngIf="!loading && !notFound"
+    [formGroup]="form"
+    (ngSubmit)="onSubmit()"
+  >
+    <mat-form-field class="w-100">
+      <mat-label>Student</mat-label>
+      <mat-select formControlName="studentId">
+        <mat-option *ngFor="let s of students" [value]="s.id">
+          {{ s.firstName }} {{ s.lastName }}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="form.get('studentId')?.hasError('required')">
+        Student is required
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field class="w-100">
+      <mat-label>Course</mat-label>
+      <mat-select formControlName="courseId">
+        <mat-option *ngFor="let c of courses" [value]="c.id">
+          {{ c.name }}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="form.get('courseId')?.hasError('required')">
+        Course is required
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field class="w-100">
+      <mat-label>Enrollment Date</mat-label>
+      <input
+        matInput
+        [matDatepicker]="picker"
+        formControlName="enrollmentDate"
+      />
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+      <mat-error *ngIf="form.get('enrollmentDate')?.hasError('required')">
+        Date is required
+      </mat-error>
+    </mat-form-field>
+
+    <div class="d-flex justify-content-end mt-3">
+      <button mat-stroked-button type="button" (click)="onCancel()">
+        Cancel
+      </button>
+      <button mat-flat-button color="accent" class="ml-2" type="submit">
+        {{ editId ? "Update" : "Create" }}
+      </button>
+    </div>
+  </form>
+</div>
