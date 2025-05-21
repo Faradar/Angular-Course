@@ -1,8 +1,42 @@
-@if ((student | async)) {
-<ng-container *ngIf="student | async as student">
-  <h1>{{ student | studentFullName | titlecase }}</h1>
-  <p><strong>Email:</strong> {{ student.email }}</p>
+<ng-container *ngIf="student$ | async as student; else notFound">
+  <mat-card class="p-4">
+    <mat-card-header>
+      <mat-card-title>
+        {{ student | studentFullName | titlecase }}
+      </mat-card-title>
+      <mat-card-subtitle>
+        {{ student.email }}
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <h3>Enrolled Courses</h3>
+
+      <mat-list *ngIf="!loading && enrolledCourses.length; else noCourses">
+        <mat-list-item *ngFor="let c of enrolledCourses; let last = last">
+          <mat-icon matListAvatar>school</mat-icon>
+          <span matLine>{{ c.name | titlecase }}</span>
+        </mat-list-item>
+      </mat-list>
+
+      <ng-template #noCourses>
+        <p class="mat-body-1">This student is not enrolled in any courses.</p>
+      </ng-template>
+    </mat-card-content>
+
+    <mat-card-actions>
+      <button mat-stroked-button (click)="goBack()">
+        <mat-icon>arrow_back</mat-icon>
+        Back to Students
+      </button>
+    </mat-card-actions>
+  </mat-card>
 </ng-container>
-} @else {
-<p>Student not found</p>
-}
+
+<ng-template #notFound>
+  <p class="mat-body-1 mat-warn">Student not found.</p>
+  <button mat-stroked-button (click)="goBack()">
+    <mat-icon>arrow_back</mat-icon>
+    Back to Students
+  </button>
+</ng-template>
