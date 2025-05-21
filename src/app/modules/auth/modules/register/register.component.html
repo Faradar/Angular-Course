@@ -1,1 +1,99 @@
-<p>register works!</p>
+<mat-card class="form-card">
+  <mat-card-header>
+    <mat-card-title>Register</mat-card-title>
+  </mat-card-header>
+
+  <mat-card-content>
+    <form
+      [formGroup]="registerForm"
+      (ngSubmit)="register()"
+      class="grid formgrid"
+    >
+      <!-- First Name -->
+      <mat-form-field class="col-12">
+        <mat-label>First Name</mat-label>
+        <input matInput formControlName="firstName" />
+        <mat-error
+          *ngIf="
+            firstName?.hasError('required') && (firstName?.touched || submitted)
+          "
+        >
+          First name is required
+        </mat-error>
+        <mat-error
+          *ngIf="
+            firstName?.hasError('minlength') &&
+            (firstName?.touched || submitted)
+          "
+        >
+          Minimum 2 characters
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Last Name -->
+      <mat-form-field class="col-12">
+        <mat-label>Last Name</mat-label>
+        <input matInput formControlName="lastName" />
+        <mat-error
+          *ngIf="
+            lastName?.hasError('required') && (lastName?.touched || submitted)
+          "
+        >
+          Last name is required
+        </mat-error>
+        <mat-error
+          *ngIf="
+            lastName?.hasError('minlength') && (lastName?.touched || submitted)
+          "
+        >
+          Minimum 2 characters
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Email -->
+      <mat-form-field class="col-12">
+        <mat-label>Email</mat-label>
+        <input matInput type="email" formControlName="email" />
+        <mat-error
+          *ngIf="email?.hasError('required') && (email?.touched || submitted)"
+        >
+          Email is required
+        </mat-error>
+        <mat-error
+          *ngIf="email?.hasError('email') && (email?.touched || submitted)"
+        >
+          Enter a valid email
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Password -->
+      <mat-form-field class="col-12">
+        <mat-label>Password</mat-label>
+        <input matInput type="password" formControlName="password" />
+        <mat-error
+          *ngIf="
+            password?.hasError('required') && (password?.touched || submitted)
+          "
+        >
+          Password is required
+        </mat-error>
+        <mat-error
+          *ngIf="
+            password?.hasError('minlength') && (password?.touched || submitted)
+          "
+        >
+          Minimum 6 characters
+        </mat-error>
+      </mat-form-field>
+
+      <div class="col-12 d-flex justify-content-end mt-3">
+        <button mat-raised-button color="primary" type="submit">
+          Register
+        </button>
+        <button mat-button color="accent" type="button" (click)="backToLogin()">
+          Already have an account? Login
+        </button>
+      </div>
+    </form>
+  </mat-card-content>
+</mat-card>
