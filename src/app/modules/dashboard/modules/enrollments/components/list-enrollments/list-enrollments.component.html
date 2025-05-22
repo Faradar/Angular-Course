@@ -4,7 +4,10 @@
 
 <div class="p-4">
   <!-- New Enrollment Button -->
-  <div class="d-flex justify-content-end mb-3">
+  <div
+    *ngIf="(authUser$ | async)?.role === 'admin'"
+    class="d-flex justify-content-end mb-3"
+  >
     <button mat-flat-button color="accent" (click)="onNew()">
       <mat-icon>add</mat-icon>
       New Enrollment
@@ -63,10 +66,20 @@
     <ng-container matColumnDef="actions">
       <th mat-header-cell *matHeaderCellDef>Actions</th>
       <td mat-cell *matCellDef="let e">
-        <button mat-icon-button color="primary" (click)="onEdit(e)">
+        <button
+          [disabled]="(authUser$ | async)?.role != 'admin'"
+          mat-icon-button
+          color="primary"
+          (click)="onEdit(e)"
+        >
           <mat-icon>edit</mat-icon>
         </button>
-        <button mat-icon-button color="warn" (click)="onDelete(e.id)">
+        <button
+          [disabled]="(authUser$ | async)?.role != 'admin'"
+          mat-icon-button
+          color="warn"
+          (click)="onDelete(e.id)"
+        >
           <mat-icon>delete</mat-icon>
         </button>
       </td>

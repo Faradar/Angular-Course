@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { Course } from '../../../../../../models';
+import { Course, User } from '../../../../../../models';
 import { CoursesService } from '../../courses.service';
 import { Router } from '@angular/router';
+import { Observable } from 'rxjs';
+import { AuthService } from '../../../../../../core/services/auth.service';
 
 @Component({
   selector: 'app-list-courses',
@@ -20,7 +22,15 @@ export class ListCoursesComponent implements OnInit {
     'actions',
   ];
 
-  constructor(private svc: CoursesService, private router: Router) {}
+  authUser$: Observable<User | null>;
+
+  constructor(
+    private svc: CoursesService,
+    private router: Router,
+    private authService: AuthService
+  ) {
+    this.authUser$ = this.authService.authUser$;
+  }
 
   ngOnInit(): void {
     this.fetchCourses();

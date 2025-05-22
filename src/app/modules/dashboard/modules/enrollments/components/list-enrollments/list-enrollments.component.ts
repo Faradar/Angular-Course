@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { Course, Enrollment, Student } from '../../../../../../models';
+import { Course, Enrollment, Student, User } from '../../../../../../models';
 import { EnrollmentsService } from '../../enrollments.service';
 import { Router } from '@angular/router';
 import { StudentsService } from '../../../students/students.service';
 import { CoursesService } from '../../../courses/courses.service';
+import { Observable } from 'rxjs';
+import { AuthService } from '../../../../../../core/services/auth.service';
 
 @Component({
   selector: 'app-list-enrollments',
@@ -31,12 +33,17 @@ export class ListEnrollmentsComponent implements OnInit {
     email: '',
   };
 
+  authUser$: Observable<User | null>;
+
   constructor(
     private svc: EnrollmentsService,
     private studentsSvc: StudentsService,
     private coursesSvc: CoursesService,
-    private router: Router
-  ) {}
+    private router: Router,
+    private authService: AuthService
+  ) {
+    this.authUser$ = this.authService.authUser$;
+  }
 
   ngOnInit(): void {
     this.loadStudents();
