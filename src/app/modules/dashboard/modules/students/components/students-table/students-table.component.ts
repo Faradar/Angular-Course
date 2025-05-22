@@ -1,5 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { Student } from '../../../../../../models';
+import { Student, User } from '../../../../../../models';
+import { Observable } from 'rxjs';
+import { AuthService } from '../../../../../../core/services/auth.service';
 
 @Component({
   selector: 'app-students-table',
@@ -18,4 +20,10 @@ export class StudentsTableComponent {
 
   @Output()
   deleteStudent = new EventEmitter<number>();
+
+  authUser$: Observable<User | null>;
+
+  constructor(private authService: AuthService) {
+    this.authUser$ = this.authService.authUser$;
+  }
 }

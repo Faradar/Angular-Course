@@ -25,6 +25,9 @@
     >
       <mat-icon>share</mat-icon>
     </button>
+    <div *ngIf="authUser$ | async; let user">
+      {{ user.username + " - " + user.role }}
+    </div>
   </mat-toolbar>
 
   <!-- SIDENAV -->

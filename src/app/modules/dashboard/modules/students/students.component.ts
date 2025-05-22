@@ -1,9 +1,11 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ErrorStateMatcher } from '@angular/material/core';
-import { Student } from '../../../../models';
+import { Student, User } from '../../../../models';
 import { SubmitErrorStateMatcher } from '../../../../errors';
 import { StudentsService } from './students.service';
+import { Observable } from 'rxjs';
+import { AuthService } from '../../../../core/services/auth.service';
 
 @Component({
   selector: 'app-students',
@@ -27,10 +29,14 @@ export class StudentsComponent {
   students: Student[] = [];
   isLoading = false;
 
+  authUser$: Observable<User | null>;
+
   constructor(
     private fb: FormBuilder,
-    private studentService: StudentsService
+    private studentService: StudentsService,
+    private authService: AuthService
   ) {
+    this.authUser$ = this.authService.authUser$;
     this.loadStudentsObservable();
 
     this.studentForm = this.fb.group({

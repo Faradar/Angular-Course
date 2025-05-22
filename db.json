@@ -1,0 +1,30 @@
+{
+  "students": [],
+  "courses": [],
+  "users": [
+    {
+      "id": 1,
+      "username": "admin",
+      "email": "admin",
+      "password": "admin",
+      "role": "admin",
+      "token": "3f456346h3543b"
+    },
+    {
+      "id": 2,
+      "username": "user",
+      "email": "user",
+      "password": "user",
+      "role": "user",
+      "token": "dasdabwg5436e5yub65y"
+    },
+    {
+      "id": 3,
+      "username": "johndoe",
+      "email": "john@doe.com",
+      "password": "123456",
+      "role": "user",
+      "token": "dasdabwg5436e5yub65yac34vywv5sh"
+    }
+  ]
+}

@@ -5,7 +5,12 @@
 </ng-container>
 
 <ng-template #notLoading>
-  <form [formGroup]="studentForm" class="w-100" (ngSubmit)="onSubmit()">
+  <form
+    *ngIf="(authUser$ | async)?.role === 'admin'"
+    [formGroup]="studentForm"
+    class="w-100"
+    (ngSubmit)="onSubmit()"
+  >
     <mat-chip-set
       *ngIf="isEditingId"
       [attr.aria-label]="'Editing student with ID ' + isEditingId"
