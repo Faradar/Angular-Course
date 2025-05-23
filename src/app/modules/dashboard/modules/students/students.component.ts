@@ -71,6 +71,41 @@ export class StudentsComponent {
     return this.studentForm.get('email');
   }
 
+  // onSubmit() {
+  //   this.submitted = true;
+  //   if (this.studentForm.invalid) {
+  //     this.studentForm.markAllAsTouched();
+  //     return;
+  //   }
+
+  //   if (this.isEditingId) {
+  //     this.students = this.students.map((student) =>
+  //       student.id === this.isEditingId
+  //         ? { ...student, ...this.studentForm.value }
+  //         : student
+  //     );
+  //   } else {
+  //     const newStudent = this.studentForm.value;
+
+  //     this.studentService.createStudent(newStudent).subscribe({
+  //       next: (res) => {
+  //         console.log('Student created:', res);
+  //         this.students = [...this.students, res];
+  //       },
+  //       error: (error) => {
+  //         console.error('Error creating student', error);
+  //       },
+  //       complete: () => {
+  //         console.log('Student created successfully');
+  //       },
+  //     });
+  //   }
+
+  //   this.isEditingId = null;
+  //   this.studentForm.reset();
+  //   this.submitted = false;
+  // }
+
   onSubmit() {
     this.submitted = true;
     if (this.studentForm.invalid) {
@@ -78,32 +113,42 @@ export class StudentsComponent {
       return;
     }
 
+    const formValue = this.studentForm.value;
     if (this.isEditingId) {
-      this.students = this.students.map((student) =>
-        student.id === this.isEditingId
-          ? { ...student, ...this.studentForm.value }
-          : student
-      );
-    } else {
-      const newStudent = this.studentForm.value;
+      const updated: Student = {
+        id: this.isEditingId,
+        ...formValue,
+      };
 
-      this.studentService.createStudent(newStudent).subscribe({
+      this.studentService.updateStudent(updated).subscribe({
         next: (res) => {
-          console.log('Student created:', res);
+          this.students = this.students.map((s) => (s.id === res.id ? res : s));
+        },
+        error: (err) => {
+          console.error('Error updating student', err);
+        },
+        complete: () => {
+          console.log('Student updated successfully');
+          this.isEditingId = null;
+          this.studentForm.reset();
+          this.submitted = false;
+        },
+      });
+    } else {
+      this.studentService.createStudent(formValue).subscribe({
+        next: (res) => {
           this.students = [...this.students, res];
         },
-        error: (error) => {
-          console.error('Error creating student', error);
+        error: (err) => {
+          console.error('Error creating student', err);
         },
         complete: () => {
           console.log('Student created successfully');
+          this.studentForm.reset();
+          this.submitted = false;
         },
       });
     }
-
-    this.isEditingId = null;
-    this.studentForm.reset();
-    this.submitted = false;
   }
 
   onEditStudent(student: Student) {
@@ -113,7 +158,17 @@ export class StudentsComponent {
 
   onDeleteStudent(id: string) {
     if (confirm('Are you sure you want to delete this student?')) {
-      this.students = this.students.filter((student) => student.id !== id);
+      this.studentService.deleteStudent(id.toLocaleString()).subscribe({
+        next: (students) => {
+          this.students = students;
+        },
+        error: (error) => {
+          console.error('Error deleting student', error);
+        },
+        complete: () => {
+          console.log('Student deleted successfully');
+        },
+      });
     }
   }
 }
