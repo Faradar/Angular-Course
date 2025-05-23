@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ErrorStateMatcher } from '@angular/material/core';
 import { Student, User } from '../../../../models';
@@ -71,41 +71,6 @@ export class StudentsComponent {
     return this.studentForm.get('email');
   }
 
-  // onSubmit() {
-  //   this.submitted = true;
-  //   if (this.studentForm.invalid) {
-  //     this.studentForm.markAllAsTouched();
-  //     return;
-  //   }
-
-  //   if (this.isEditingId) {
-  //     this.students = this.students.map((student) =>
-  //       student.id === this.isEditingId
-  //         ? { ...student, ...this.studentForm.value }
-  //         : student
-  //     );
-  //   } else {
-  //     const newStudent = this.studentForm.value;
-
-  //     this.studentService.createStudent(newStudent).subscribe({
-  //       next: (res) => {
-  //         console.log('Student created:', res);
-  //         this.students = [...this.students, res];
-  //       },
-  //       error: (error) => {
-  //         console.error('Error creating student', error);
-  //       },
-  //       complete: () => {
-  //         console.log('Student created successfully');
-  //       },
-  //     });
-  //   }
-
-  //   this.isEditingId = null;
-  //   this.studentForm.reset();
-  //   this.submitted = false;
-  // }
-
   onSubmit() {
     this.submitted = true;
     if (this.studentForm.invalid) {
@@ -129,9 +94,7 @@ export class StudentsComponent {
         },
         complete: () => {
           console.log('Student updated successfully');
-          this.isEditingId = null;
-          this.studentForm.reset();
-          this.submitted = false;
+          this.clearForm();
         },
       });
     } else {
@@ -144,8 +107,7 @@ export class StudentsComponent {
         },
         complete: () => {
           console.log('Student created successfully');
-          this.studentForm.reset();
-          this.submitted = false;
+          this.clearForm();
         },
       });
     }
@@ -170,5 +132,17 @@ export class StudentsComponent {
         },
       });
     }
+  }
+
+  // Clear form by pressing ESC
+  @HostListener('window:keydown.escape', ['$event'])
+  onEscPressed(event: KeyboardEvent) {
+    this.clearForm();
+  }
+
+  clearForm() {
+    this.studentForm.reset();
+    this.isEditingId = null;
+    this.submitted = false;
   }
 }
