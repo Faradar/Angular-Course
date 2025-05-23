@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Student } from '../../../../models';
+import { Student, StudentForm } from '../../../../models';
 import { map, Observable, of } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 
 const MY_FAKE_DB: Student[] = [
   {
@@ -69,6 +70,8 @@ const MY_FAKE_DB: Student[] = [
   providedIn: 'root',
 })
 export class StudentsService {
+  constructor(private http: HttpClient) {}
+
   getStudents(): Observable<Student[]> {
     const studentObservable = new Observable<Student[]>((observer) => {
       setTimeout(() => {
@@ -84,5 +87,9 @@ export class StudentsService {
     return of([...MY_FAKE_DB]).pipe(
       map((students) => students.find((student) => student.id == id) || null)
     );
+  }
+
+  createStudent(student: StudentForm): Observable<Student> {
+    return this.http.post<Student>('http://localhost:3000/students', student);
   }
 }

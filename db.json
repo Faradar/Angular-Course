@@ -1,9 +1,71 @@
 {
-  "students": [],
+  "students": [
+    {
+      "id": "3a22",
+      "firstName": "Mary",
+      "lastName": "Smith",
+      "email": "mary.smith@example.com"
+    },
+    {
+      "id": "f97c",
+      "firstName": "John",
+      "lastName": "Doe",
+      "email": "john.doe@example.com"
+    },
+    {
+      "id": "a1e8",
+      "firstName": "Alice",
+      "lastName": "Jones",
+      "email": "alice.jones@example.com"
+    },
+    {
+      "id": "5c83",
+      "firstName": "Robert",
+      "lastName": "Brown",
+      "email": "robert.brown@example.com"
+    },
+    {
+      "id": "0d34",
+      "firstName": "Emma",
+      "lastName": "Wilson",
+      "email": "emma.wilson@example.com"
+    },
+    {
+      "id": "99d6",
+      "firstName": "Michael",
+      "lastName": "Lee",
+      "email": "michael.lee@example.com"
+    },
+    {
+      "id": "e6e1",
+      "firstName": "Laura",
+      "lastName": "Kim",
+      "email": "laura.kim@example.com"
+    },
+    {
+      "id": "4a29",
+      "firstName": "\tDavid",
+      "lastName": "Garcia",
+      "email": "david.garcia@example.com"
+    },
+    {
+      "id": "c06b",
+      "firstName": "Sophia",
+      "lastName": "Martinez",
+      "email": "sophia.martinez@example.com"
+    },
+    {
+      "id": "b1a4",
+      "firstName": "Daniel",
+      "lastName": "Wong",
+      "email": "daniel.wong@example.com"
+    }
+  ],
   "courses": [],
+  "enrollments": [],
   "users": [
     {
-      "id": 1,
+      "id": "1",
       "username": "admin",
       "email": "admin",
       "password": "admin",
@@ -11,7 +73,7 @@
       "token": "3f456346h3543b"
     },
     {
-      "id": 2,
+      "id": "2",
       "username": "user",
       "email": "user",
       "password": "user",
@@ -19,7 +81,7 @@
       "token": "dasdabwg5436e5yub65y"
     },
     {
-      "id": 3,
+      "id": "3",
       "username": "johndoe",
       "email": "john@doe.com",
       "password": "123456",

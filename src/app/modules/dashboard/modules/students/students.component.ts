@@ -86,9 +86,19 @@ export class StudentsComponent {
       );
     } else {
       const newStudent = this.studentForm.value;
-      newStudent.id = this.students.length + 1;
 
-      this.students = [...this.students, newStudent];
+      this.studentService.createStudent(newStudent).subscribe({
+        next: (res) => {
+          console.log('Student created:', res);
+          this.students = [...this.students, res];
+        },
+        error: (error) => {
+          console.error('Error creating student', error);
+        },
+        complete: () => {
+          console.log('Student created successfully');
+        },
+      });
     }
 
     this.isEditingId = null;
