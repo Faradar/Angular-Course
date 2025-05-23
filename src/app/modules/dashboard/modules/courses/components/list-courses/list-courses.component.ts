@@ -54,7 +54,7 @@ export class ListCoursesComponent implements OnInit {
     this.router.navigate(['dashboard', 'courses', 'edit', course.id]);
   }
 
-  onDelete(id: number): void {
+  onDelete(id: string): void {
     if (!confirm('Delete this course?')) {
       return;
     }

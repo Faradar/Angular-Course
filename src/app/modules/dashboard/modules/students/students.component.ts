@@ -23,7 +23,7 @@ import { AuthService } from '../../../../core/services/auth.service';
   ],
 })
 export class StudentsComponent {
-  isEditingId: number | null = null;
+  isEditingId: string | null = null;
   studentForm: FormGroup;
   submitted = false;
   students: Student[] = [];
@@ -111,7 +111,7 @@ export class StudentsComponent {
     this.studentForm.patchValue(student);
   }
 
-  onDeleteStudent(id: number) {
+  onDeleteStudent(id: string) {
     if (confirm('Are you sure you want to delete this student?')) {
       this.students = this.students.filter((student) => student.id !== id);
     }

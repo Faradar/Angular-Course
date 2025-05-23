@@ -44,7 +44,7 @@
     },
     {
       "id": "4a29",
-      "firstName": "\tDavid",
+      "firstName": "David",
       "lastName": "Garcia",
       "email": "david.garcia@example.com"
     },
@@ -61,8 +61,136 @@
       "email": "daniel.wong@example.com"
     }
   ],
-  "courses": [],
-  "enrollments": [],
+  "courses": [
+    {
+      "name": "Angular Basics",
+      "description": "Introduction to Angular",
+      "durationHours": 10,
+      "id": "bcbe"
+    },
+    {
+      "id": "265d",
+      "name": "Angular Advanced",
+      "description": "Advanced in Angular",
+      "durationHours": 20
+    },
+    {
+      "id": "c98f",
+      "name": "Angular Professional",
+      "description": "Professional in Angular",
+      "durationHours": 30
+    },
+    {
+      "id": "6b82",
+      "name": "Angular Master",
+      "description": "Master in Angular",
+      "durationHours": 40
+    },
+    {
+      "id": "db3b",
+      "name": "Angular Master Pro",
+      "description": "Master Pro in Angular",
+      "durationHours": 50
+    },
+    {
+      "id": "59d7",
+      "name": "Angular Master Pro Max",
+      "description": "Master Pro Max in Angular",
+      "durationHours": 60
+    },
+    {
+      "id": "3010",
+      "name": "Angular Master Pro Max Ultra",
+      "description": "Master Pro Max Ultra in Angular",
+      "durationHours": 70
+    },
+    {
+      "id": "f535",
+      "name": "Angular Master Pro Max Ultra Max",
+      "description": "Master Pro Max Ultra Max in Angular",
+      "durationHours": 80
+    },
+    {
+      "id": "1b73",
+      "name": "Angular Master Pro Max Ultra Max Max",
+      "description": "Master Pro Max Ultra Max Max in Angular",
+      "durationHours": 90
+    },
+    {
+      "id": "6284",
+      "name": "Angular Master Pro Max Ultra Max Max Max",
+      "description": "Master Pro Max Ultra Max Max Max in Angular",
+      "durationHours": 100
+    }
+  ],
+  "enrollments": [
+    {
+      "id": "f61e",
+      "studentId": "3a22",
+      "courseId": "265d",
+      "enrollmentDate": "2025-06-11T03:00:00.000Z"
+    },
+    {
+      "id": "53da",
+      "studentId": "a1e8",
+      "courseId": "bcbe",
+      "enrollmentDate": "2025-05-23T06:04:34.061Z"
+    },
+    {
+      "id": "e910",
+      "studentId": "f97c",
+      "courseId": "c98f",
+      "enrollmentDate": "2025-05-13T03:00:00.000Z"
+    },
+    {
+      "id": "f04a",
+      "studentId": "5c83",
+      "courseId": "265d",
+      "enrollmentDate": "2029-02-06T03:00:00.000Z"
+    },
+    {
+      "id": "4d68",
+      "studentId": "0d34",
+      "courseId": "bcbe",
+      "enrollmentDate": "2025-05-30T03:00:00.000Z"
+    },
+    {
+      "id": "1ed9",
+      "studentId": "99d6",
+      "courseId": "c98f",
+      "enrollmentDate": "2025-05-20T03:00:00.000Z"
+    },
+    {
+      "id": "b6b7",
+      "studentId": "e6e1",
+      "courseId": "265d",
+      "enrollmentDate": "2032-01-13T03:00:00.000Z"
+    },
+    {
+      "id": "4bfd",
+      "studentId": "4a29",
+      "courseId": "bcbe",
+      "enrollmentDate": "2025-05-24T03:00:00.000Z"
+    },
+    {
+      "id": "2dba",
+      "studentId": "c06b",
+      "courseId": "c98f",
+      "enrollmentDate": "2025-05-11T03:00:00.000Z"
+    },
+    {
+      "id": "ef37",
+      "studentId": "b1a4",
+      "courseId": "265d",
+      "enrollmentDate": "2025-05-01T03:00:00.000Z"
+    },
+    {
+      "id": "2453",
+      "studentId": "3a22",
+      "courseId": "3010",
+      "enrollmentDate": "2025-05-23T06:12:01.666Z"
+    }
+  ],
   "users": [
     {
       "id": "1",

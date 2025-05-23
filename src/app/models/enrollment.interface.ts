@@ -1,6 +1,6 @@
 export interface Enrollment {
-  id: number;
-  studentId: number;
-  courseId: number;
+  id: string;
+  studentId: string;
+  courseId: string;
   enrollmentDate: Date;
 }

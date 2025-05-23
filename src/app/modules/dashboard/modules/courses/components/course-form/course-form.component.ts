@@ -13,7 +13,7 @@ import { CoursesService } from '../../courses.service';
 })
 export class CourseFormComponent implements OnInit {
   form!: FormGroup;
-  editId: number | null = null;
+  editId: string | null = null;
   loading = false;
   notFound = false;
 
@@ -25,24 +25,22 @@ export class CourseFormComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Build form with validators
     this.form = this.fb.group({
       name: ['', Validators.required],
       description: [''],
       durationHours: [0, [Validators.required, Validators.min(1)]],
     });
 
-    // Check for :id in route
     const idParam = this.route.snapshot.paramMap.get('id');
+
     if (idParam) {
-      this.editId = +idParam;
+      this.editId = idParam;
       this.fetchCourse(this.editId);
     }
   }
 
-  private fetchCourse(id: number): void {
+  private fetchCourse(id: string): void {
     this.loading = true;
-    // Reuse getCourses() and find the one, or create a getCourse(id) in the service
     this.svc.getCourses().subscribe({
       next: (list) => {
         const course = list.find((c) => c.id === id);
@@ -55,6 +53,7 @@ export class CourseFormComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error fetching course', err);
+        this.notFound = true;
         this.loading = false;
       },
     });
@@ -66,7 +65,7 @@ export class CourseFormComponent implements OnInit {
       return;
     }
 
-    const payload: Course = this.form.value;
+    const payload: Course = { ...this.form.value } as Course;
     if (this.editId) {
       payload.id = this.editId;
       this.svc

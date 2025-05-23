@@ -76,7 +76,7 @@
 
   <app-students-table
     (editStudent)="onEditStudent($event)"
-    (deleteStudent)="onDeleteStudent($event)"
+    (deleteStudent)="onDeleteStudent($event.toString())"
     [dataSource]="students"
   />
 </ng-template>

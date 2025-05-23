@@ -15,8 +15,8 @@ import { AuthService } from '../../../../../../core/services/auth.service';
 })
 export class ListEnrollmentsComponent implements OnInit {
   enrollments: Enrollment[] = [];
-  studentsMap = new Map<number, Student>();
-  coursesMap = new Map<number, Course>();
+  studentsMap = new Map<string, Student>();
+  coursesMap = new Map<string, Course>();
   loading = false;
   displayedColumns = [
     'id',
@@ -27,7 +27,7 @@ export class ListEnrollmentsComponent implements OnInit {
   ];
 
   fallbackStudent: Student = {
-    id: 0,
+    id: '0',
     firstName: 'Unknown',
     lastName: 'Student',
     email: '',
@@ -85,7 +85,7 @@ export class ListEnrollmentsComponent implements OnInit {
     this.router.navigate(['dashboard', 'enrollments', 'edit', e.id]);
   }
 
-  onDelete(id: number): void {
+  onDelete(id: string): void {
     if (!confirm('Delete this enrollment?')) return;
     this.svc.deleteEnrollment(id).subscribe({
       next: () => this.fetch(),

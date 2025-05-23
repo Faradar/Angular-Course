@@ -15,7 +15,7 @@ import { forkJoin } from 'rxjs';
 })
 export class EnrollmentFormComponent implements OnInit {
   form!: FormGroup;
-  editId: number | null = null;
+  editId: string | null = null;
   loading = false;
 
   students: Student[] = [];
@@ -23,9 +23,6 @@ export class EnrollmentFormComponent implements OnInit {
   enrollments: Enrollment[] = [];
 
   notFound = false;
-
-  /** remember the original course in edit mode **/
-  private originalCourseId: number | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -37,14 +34,12 @@ export class EnrollmentFormComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // 1) build the form
     this.form = this.fb.group({
       studentId: [null, Validators.required],
       courseId: [null, Validators.required],
       enrollmentDate: [new Date(), Validators.required],
     });
 
-    // 2) load students, courses & enrollments in parallel
     this.loading = true;
     forkJoin({
       students: this.studentsSvc.getStudents(),
@@ -56,39 +51,33 @@ export class EnrollmentFormComponent implements OnInit {
       this.enrollments = enrollments;
       this.loading = false;
 
-      // 3) if we're editing, patch the form and capture originalCourseId
       const idParam = this.route.snapshot.paramMap.get('id');
       if (idParam) {
-        this.editId = +idParam;
-        const e = enrollments.find((x) => x.id === this.editId);
-        if (!e) {
-          this.notFound = true;
-          return;
-        }
-        this.originalCourseId = e.courseId;
-        this.form.patchValue({
-          studentId: e.studentId,
-          courseId: e.courseId,
-          enrollmentDate: new Date(e.enrollmentDate),
+        this.editId = idParam;
+        this.svc.getEnrollmentById(idParam).subscribe((e) => {
+          if (!e) {
+            this.notFound = true;
+            console.error('Enrollment not found');
+            return;
+          }
+          this.form.patchValue({
+            studentId: e.studentId,
+            courseId: e.courseId,
+            enrollmentDate: new Date(e.enrollmentDate),
+          });
         });
       }
     });
 
-    // 4) whenever the student changes, clear out the old course selection
     this.form.get('studentId')!.valueChanges.subscribe(() => {
       this.form.get('courseId')!.setValue(null);
     });
   }
 
-  /**
-   * Disable any course the current student is already enrolled in,
-   * except the originalCourseId when in edit mode.
-   */
-  isCourseDisabled(courseId: number): boolean {
+  isCourseDisabled(courseId: string): boolean {
     const sid = this.form.get('studentId')?.value;
     if (!sid) return false;
 
-    // otherwise disable if an enrollment exists for this student+course
     return this.enrollments.some(
       (e) => e.studentId === sid && e.courseId === courseId
     );
@@ -101,9 +90,7 @@ export class EnrollmentFormComponent implements OnInit {
     }
     const payload: Enrollment = {
       ...this.form.value,
-      id: this.editId || 0,
-    };
-
+    } as Enrollment;
     const op$ = this.editId
       ? this.svc.updateEnrollment(payload)
       : this.svc.createEnrollment(payload);
