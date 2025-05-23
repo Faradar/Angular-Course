@@ -9,41 +9,20 @@
       (ngSubmit)="register()"
       class="grid formgrid"
     >
-      <!-- First Name -->
+      <!-- Username -->
       <mat-form-field class="col-12">
-        <mat-label>First Name</mat-label>
-        <input matInput formControlName="firstName" />
+        <mat-label>Username</mat-label>
+        <input matInput formControlName="userName" />
         <mat-error
           *ngIf="
-            firstName?.hasError('required') && (firstName?.touched || submitted)
+            userName?.hasError('required') && (userName?.touched || submitted)
           "
         >
-          First name is required
+          Username is required
         </mat-error>
         <mat-error
           *ngIf="
-            firstName?.hasError('minlength') &&
-            (firstName?.touched || submitted)
-          "
-        >
-          Minimum 2 characters
-        </mat-error>
-      </mat-form-field>
-
-      <!-- Last Name -->
-      <mat-form-field class="col-12">
-        <mat-label>Last Name</mat-label>
-        <input matInput formControlName="lastName" />
-        <mat-error
-          *ngIf="
-            lastName?.hasError('required') && (lastName?.touched || submitted)
-          "
-        >
-          Last name is required
-        </mat-error>
-        <mat-error
-          *ngIf="
-            lastName?.hasError('minlength') && (lastName?.touched || submitted)
+            userName?.hasError('minlength') && (userName?.touched || submitted)
           "
         >
           Minimum 2 characters

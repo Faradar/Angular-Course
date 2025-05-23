@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { UsersService } from '../../../../core/services/users.service';
+import { User } from '../../../../models';
 
 @Component({
   selector: 'app-register',
@@ -12,13 +14,15 @@ export class RegisterComponent implements OnInit {
   registerForm!: FormGroup;
   submitted = false;
 
-  constructor(private fb: FormBuilder, private router: Router) {}
+  constructor(
+    private fb: FormBuilder,
+    private router: Router,
+    private usersSvc: UsersService
+  ) {}
 
   ngOnInit() {
-    // build the form and add validators
     this.registerForm = this.fb.group({
-      firstName: ['', [Validators.required, Validators.minLength(2)]],
-      lastName: ['', [Validators.required, Validators.minLength(2)]],
+      userName: ['', [Validators.required, Validators.minLength(2)]],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
     });
@@ -29,11 +33,8 @@ export class RegisterComponent implements OnInit {
     return this.registerForm.controls;
   }
 
-  get firstName() {
-    return this.registerForm.get('firstName');
-  }
-  get lastName() {
-    return this.registerForm.get('lastName');
+  get userName() {
+    return this.registerForm.get('userName');
   }
   get email() {
     return this.registerForm.get('email');
@@ -42,18 +43,35 @@ export class RegisterComponent implements OnInit {
     return this.registerForm.get('password');
   }
 
+  private generateToken(): string {
+    return Math.random().toString(36).substring(2) + Date.now().toString(36);
+  }
+
   register() {
     this.submitted = true;
 
-    // stop if the form is invalid
     if (this.registerForm.invalid) {
       this.registerForm.markAllAsTouched();
       return;
     }
 
-    // TODO: call your auth service here
+    const payload: Omit<User, 'id'> = {
+      username: this.userName?.value,
+      email: this.email?.value,
+      password: this.password?.value,
+      role: 'user',
+      token: this.generateToken(),
+    };
 
-    this.router.navigate(['/dashboard']);
+    this.usersSvc.createUser(payload).subscribe({
+      next: (newUser) => {
+        console.log('Registered user:', newUser);
+        this.router.navigate(['/auth/login']);
+      },
+      error: (err) => {
+        console.error('Registration failed', err);
+      },
+    });
   }
 
   backToLogin() {

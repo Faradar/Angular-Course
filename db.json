@@ -193,28 +193,28 @@
   ],
   "users": [
     {
-      "id": "1",
+      "id": "7f86",
       "username": "admin",
       "email": "admin",
       "password": "admin",
       "role": "admin",
-      "token": "3f456346h3543b"
+      "token": "s4gcm2vzmqmb134kzm"
     },
     {
-      "id": "2",
+      "id": "58be",
       "username": "user",
       "email": "user",
       "password": "user",
       "role": "user",
-      "token": "dasdabwg5436e5yub65y"
+      "token": "yxnakbziqomb135wiy"
     },
     {
-      "id": "3",
+      "id": "f0ea",
       "username": "johndoe",
       "email": "john@doe.com",
       "password": "123456",
       "role": "user",
-      "token": "dasdabwg5436e5yub65yac34vywv5sh"
+      "token": "v0cgrt3dj0smb136p3g"
     }
   ]
 }
