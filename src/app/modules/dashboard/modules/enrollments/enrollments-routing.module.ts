@@ -8,7 +8,6 @@ const routes: Routes = [
   { path: '', component: ListEnrollmentsComponent },
   {
     path: 'new',
-    canActivate: [adminGuard],
     component: EnrollmentFormComponent,
   },
   {

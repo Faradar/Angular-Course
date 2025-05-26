@@ -4,10 +4,7 @@
 
 <div class="p-4">
   <!-- New Enrollment Button -->
-  <div
-    *ngIf="(authUser$ | async)?.role === 'admin'"
-    class="d-flex justify-content-end mb-3"
-  >
+  <div class="d-flex justify-content-end mb-3">
     <button mat-flat-button color="accent" (click)="onNew()">
       <mat-icon>add</mat-icon>
       New Enrollment
@@ -74,12 +71,7 @@
         >
           <mat-icon>edit</mat-icon>
         </button>
-        <button
-          [disabled]="(authUser$ | async)?.role != 'admin'"
-          mat-icon-button
-          color="warn"
-          (click)="onDelete(e.id)"
-        >
+        <button mat-icon-button color="warn" (click)="onDelete(e.id)">
           <mat-icon>delete</mat-icon>
         </button>
       </td>
