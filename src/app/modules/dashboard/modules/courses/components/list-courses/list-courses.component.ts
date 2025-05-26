@@ -50,6 +50,10 @@ export class ListCoursesComponent implements OnInit {
     });
   }
 
+  onNew(): void {
+    this.router.navigate(['/dashboard/courses/new']);
+  }
+
   onEdit(course: Course): void {
     this.router.navigate(['dashboard', 'courses', 'edit', course.id]);
   }
@@ -62,9 +66,5 @@ export class ListCoursesComponent implements OnInit {
       next: () => this.fetchCourses(),
       error: (err) => console.error('Delete failed', err),
     });
-  }
-
-  onNew(): void {
-    this.router.navigate(['/dashboard/courses/new']);
   }
 }
