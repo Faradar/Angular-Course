@@ -12,10 +12,23 @@
     <mat-card-content>
       <h3>Enrolled Courses</h3>
 
-      <mat-list *ngIf="!loading && enrolledCourses.length; else noCourses">
+      <mat-list
+        *ngIf="!loading && enrolledCourses.length; else noCourses"
+        class="centered-enrollments"
+      >
         <mat-list-item *ngFor="let c of enrolledCourses; let last = last">
-          <mat-icon matListAvatar>school</mat-icon>
-          <span matLine>{{ c.name | titlecase }}</span>
+          <div class="testing">
+            <mat-icon matListAvatar>school</mat-icon>
+            <span matLine>{{ c.name | titlecase }}</span>
+            <button
+              mat-icon-button
+              color="warn"
+              aria-label="Remove enrollment"
+              (click)="removeEnrollment(c.id)"
+            >
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
         </mat-list-item>
       </mat-list>
 
