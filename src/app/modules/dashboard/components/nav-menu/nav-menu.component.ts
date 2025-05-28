@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
-import { Link } from '../../../../models';
+import { Link, User } from '../../../../models';
 import { Router } from '@angular/router';
+import { AuthService } from '../../../../core/services/auth.service';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-nav-menu',
@@ -16,7 +18,11 @@ export class NavMenuComponent {
     { id: 4, label: 'Users', url: 'users', isActive: false },
   ];
 
-  constructor(private router: Router) {}
+  authUser$!: Observable<User | null>;
+
+  constructor(private router: Router, private authService: AuthService) {
+    this.authUser$ = this.authService.authUser$;
+  }
 
   logout() {
     localStorage.removeItem('token');

@@ -1,15 +1,17 @@
 <mat-nav-list>
-  <a
-    *ngFor="let link of list; trackBy: trackByLink"
-    mat-list-item
-    [routerLink]="link.url"
-    routerLinkActive="active-link"
-    #rla="routerLinkActive"
-    [activated]="rla.isActive"
-    [routerLinkActiveOptions]="{ exact: true }"
-  >
-    {{ link.label }}
-  </a>
+  <ng-container *ngFor="let link of list; trackBy: trackByLink">
+    <a
+      mat-list-item
+      [routerLink]="link.url"
+      routerLinkActive="active-link"
+      #rla="routerLinkActive"
+      [activated]="rla.isActive"
+      [routerLinkActiveOptions]="{ exact: true }"
+      *ngIf="link.label !== 'Users' || (authUser$ | async)?.role === 'admin'"
+    >
+      {{ link.label }}
+    </a>
+  </ng-container>
 
   <!-- Logout button -->
   <a mat-list-item (click)="logout()"> Logout </a>
