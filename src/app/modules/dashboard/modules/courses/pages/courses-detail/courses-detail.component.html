@@ -1,0 +1,55 @@
+<ng-container *ngIf="!notFound; else notFoundTpl">
+  <mat-card class="p-4">
+    <mat-card-header>
+      <mat-card-title>
+        {{ course?.name | titlecase }}
+      </mat-card-title>
+      <mat-card-subtitle>
+        {{ course?.description }}
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <h3>Enrolled Students</h3>
+
+      <mat-list
+        *ngIf="!loading && enrolledStudents.length; else noStudentsTpl"
+        class="centered-enrollments"
+      >
+        <mat-list-item *ngFor="let s of enrolledStudents">
+          <div class="student-item">
+            <mat-icon matListAvatar>person</mat-icon>
+            <span matLine>{{ s | studentFullName | titlecase }}</span>
+            <button
+              mat-icon-button
+              color="warn"
+              aria-label="Remove student"
+              (click)="removeStudent(s.id)"
+            >
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </mat-list-item>
+      </mat-list>
+    </mat-card-content>
+
+    <mat-card-actions>
+      <button mat-stroked-button (click)="goBack()">
+        <mat-icon>arrow_back</mat-icon>
+        Back to Courses
+      </button>
+    </mat-card-actions>
+  </mat-card>
+</ng-container>
+
+<ng-template #noStudentsTpl>
+  <p class="mat-body-1">No students are currently enrolled in this course.</p>
+</ng-template>
+
+<ng-template #notFoundTpl>
+  <p class="mat-body-1 mat-warn">Course not found.</p>
+  <button mat-stroked-button (click)="goBack()">
+    <mat-icon>arrow_back</mat-icon>
+    Back to Courses
+  </button>
+</ng-template>

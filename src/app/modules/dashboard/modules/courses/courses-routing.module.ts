@@ -3,9 +3,14 @@ import { RouterModule, Routes } from '@angular/router';
 import { ListCoursesComponent } from './components/list-courses/list-courses.component';
 import { CourseFormComponent } from './components/course-form/course-form.component';
 import { adminGuard } from '../../../../core/guards/admin.guard';
+import { CoursesDetailComponent } from './pages/courses-detail/courses-detail.component';
 
 const routes: Routes = [
   { path: '', component: ListCoursesComponent },
+  {
+    path: ':id',
+    component: CoursesDetailComponent,
+  },
   { path: 'new', canActivate: [adminGuard], component: CourseFormComponent },
   {
     path: 'edit/:id',

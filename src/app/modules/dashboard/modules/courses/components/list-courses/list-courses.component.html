@@ -58,6 +58,13 @@
       <th mat-header-cell *matHeaderCellDef>Actions</th>
       <td mat-cell *matCellDef="let c">
         <button
+          mat-icon-button
+          aria-label="View course"
+          [routerLink]="['/dashboard/courses', c.id]"
+        >
+          <mat-icon>visibility</mat-icon>
+        </button>
+        <button
           [disabled]="(authUser$ | async)?.role != 'admin'"
           mat-icon-button
           color="primary"

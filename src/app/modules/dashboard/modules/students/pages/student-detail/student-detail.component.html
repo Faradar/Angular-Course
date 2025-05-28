@@ -17,7 +17,7 @@
         class="centered-enrollments"
       >
         <mat-list-item *ngFor="let c of enrolledCourses; let last = last">
-          <div class="testing">
+          <div class="course-item">
             <mat-icon matListAvatar>school</mat-icon>
             <span matLine>{{ c.name | titlecase }}</span>
             <button
