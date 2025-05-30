@@ -224,6 +224,14 @@
       "password": "123456",
       "role": "admin",
       "id": "f28a"
+    },
+    {
+      "id": "11c6",
+      "username": "test",
+      "email": "test@test",
+      "password": "123456",
+      "role": "user",
+      "token": "162v91591hsmba4sb0e"
     }
   ]
 }

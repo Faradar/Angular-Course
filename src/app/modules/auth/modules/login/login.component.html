@@ -4,24 +4,19 @@
   </mat-card-header>
 
   <mat-card-content>
-    <form [formGroup]="loginForm" class="grid formgrid">
+    <form [formGroup]="loginForm" (ngSubmit)="login()" class="grid formgrid">
       <mat-form-field class="col-12">
         <mat-label>Email</mat-label>
         <input formControlName="email" matInput />
       </mat-form-field>
+
       <mat-form-field class="col-12">
         <mat-label>Password</mat-label>
         <input formControlName="password" matInput type="password" />
       </mat-form-field>
+
       <div class="col-12 d-flex justify-content-end">
-        <button
-          mat-raised-button
-          color="primary"
-          (click)="login()"
-          type="button"
-        >
-          Login
-        </button>
+        <button mat-raised-button color="primary" type="submit">Login</button>
         <button
           mat-raised-button
           color="accent"
