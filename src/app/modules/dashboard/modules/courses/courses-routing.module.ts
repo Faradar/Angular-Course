@@ -7,15 +7,15 @@ import { CoursesDetailComponent } from './pages/courses-detail/courses-detail.co
 
 const routes: Routes = [
   { path: '', component: ListCoursesComponent },
-  {
-    path: ':id',
-    component: CoursesDetailComponent,
-  },
   { path: 'new', canActivate: [adminGuard], component: CourseFormComponent },
   {
     path: 'edit/:id',
     canActivate: [adminGuard],
     component: CourseFormComponent,
+  },
+  {
+    path: ':id',
+    component: CoursesDetailComponent,
   },
 ];
 

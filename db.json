@@ -219,19 +219,12 @@
       "token": "4gi6972us16mb5o99d7"
     },
     {
+      "id": "6629",
       "username": "testadmin",
       "email": "testadmin@testadmin",
       "password": "123456",
       "role": "admin",
-      "id": "f28a"
-    },
-    {
-      "id": "11c6",
-      "username": "test",
-      "email": "test@test",
-      "password": "123456",
-      "role": "user",
-      "token": "162v91591hsmba4sb0e"
+      "token": "xpzkypsaa2mba4y4xw"
     }
   ]
 }
