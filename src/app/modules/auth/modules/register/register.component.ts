@@ -65,7 +65,6 @@ export class RegisterComponent implements OnInit {
 
     this.usersSvc.createUser(payload).subscribe({
       next: (newUser) => {
-        console.log('Registered user:', newUser);
         this.router.navigate(['/auth/login']);
       },
       error: (err) => {

@@ -16,7 +16,7 @@ export const initialState: StudentsState = {
   error: null,
 };
 
-const studentsReducer = createReducer(
+export const studentsReducer = createReducer(
   initialState,
 
   // Load
