@@ -1,9 +1,17 @@
 import { Component, OnInit } from '@angular/core';
 import { User } from '../../../../../../models';
 import { Observable } from 'rxjs';
-import { UsersService } from '../../users.service';
 import { AuthService } from '../../../../../../core/services/auth.service';
 import { Router } from '@angular/router';
+import { select, Store } from '@ngrx/store';
+import { UIActions } from '../../../../../../store/ui/ui.actions';
+import {
+  selectAllUsers,
+  selectUsersError,
+  selectUsersLoading,
+} from '../../store/users.selectors';
+import { selectAuthUser } from '../../../../../../store/auth/auth.selectors';
+import { UsersActions } from '../../store/users.actions';
 
 @Component({
   selector: 'app-list-users',
@@ -12,48 +20,40 @@ import { Router } from '@angular/router';
   styleUrl: './list-users.component.scss',
 })
 export class ListUsersComponent implements OnInit {
-  users: User[] = [];
-  loading = false;
+  users$: Observable<User[]>;
+  loading$: Observable<boolean>;
+  error$: Observable<string | null>;
   authUser$: Observable<User | null>;
 
-  displayedColumns = ['id', 'username', 'email', 'role', 'actions'];
+  displayedColumns: string[] = ['id', 'username', 'email', 'role', 'actions'];
 
-  constructor(
-    private usersSvc: UsersService,
-    private authSvc: AuthService,
-    private router: Router
-  ) {
-    this.authUser$ = this.authSvc.authUser$;
+  constructor(private store: Store, private router: Router) {
+    this.users$ = this.store.pipe(select(selectAllUsers));
+    this.loading$ = this.store.pipe(select(selectUsersLoading));
+    this.error$ = this.store.pipe(select(selectUsersError));
+    this.authUser$ = this.store.pipe(select(selectAuthUser));
   }
 
   ngOnInit(): void {
-    this.fetchUsers();
+    setTimeout(() => {
+      this.store.dispatch(UIActions.setToolbarTitle({ title: 'Users' }));
+    }, 0);
+
+    this.store.dispatch(UsersActions.loadUsers());
   }
 
-  private fetchUsers(): void {
-    this.loading = true;
-    this.usersSvc.getUsers().subscribe({
-      next: (data) => {
-        this.users = data;
-        this.loading = false;
-      },
-      error: (err) => {
-        console.error('Error loading courses', err);
-        this.loading = false;
-      },
-    });
+  onNew(): void {
+    this.router.navigate(['/dashboard/users/new']);
   }
 
-  onNew() {
-    this.router.navigate(['dashboard', 'users', 'new']);
+  onEdit(userId: string): void {
+    this.router.navigate(['/dashboard/users/edit', userId]);
   }
 
-  onEdit(id: string) {
-    this.router.navigate(['dashboard', 'users', 'edit', id]);
-  }
-
-  onDelete(id: string) {
-    if (!confirm('Delete user?')) return;
-    this.usersSvc.deleteUser(id).subscribe(() => this.fetchUsers());
+  onDelete(userId: string): void {
+    if (!confirm('Are you sure you want to delete this user?')) {
+      return;
+    }
+    this.store.dispatch(UsersActions.deleteUser({ id: userId }));
   }
 }

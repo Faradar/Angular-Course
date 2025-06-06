@@ -8,6 +8,12 @@ import { HighlightDirective } from './directives/highlight.directive';
 import { SharedModule } from '../../../../shared/shared.module';
 import { StudentDetailComponent } from './pages/student-detail/student-detail.component';
 
+// NGRX imports
+import { StoreModule } from '@ngrx/store';
+import { studentsFeature } from './store/students.reducer';
+import { EffectsModule } from '@ngrx/effects';
+import { StudentsEffects } from './store/students.effects';
+
 @NgModule({
   declarations: [
     StudentsComponent,
@@ -15,7 +21,13 @@ import { StudentDetailComponent } from './pages/student-detail/student-detail.co
     HighlightDirective,
     StudentDetailComponent,
   ],
-  imports: [CommonModule, StudentsRoutingModule, SharedModule],
+  imports: [
+    CommonModule,
+    StudentsRoutingModule,
+    SharedModule,
+    StoreModule.forFeature(studentsFeature),
+    EffectsModule.forFeature([StudentsEffects]),
+  ],
   exports: [StudentsComponent],
 })
 export class StudentsModule {}

@@ -33,6 +33,22 @@ export class AuthService {
       });
   }
 
+  loginApi(email: string, password: string): Observable<User> {
+    return this.http
+      .get<User[]>(
+        `http://localhost:3000/users?email=${email}&password=${password}`
+      )
+      .pipe(
+        map((arr) => {
+          if (arr.length) {
+            return arr[0];
+          } else {
+            throw new Error('Invalid credentials');
+          }
+        })
+      );
+  }
+
   logout(): void {
     localStorage.removeItem('token');
     this._authUser$.next(null);

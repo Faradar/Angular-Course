@@ -1,11 +1,19 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ErrorStateMatcher } from '@angular/material/core';
 import { Student, User } from '../../../../models';
 import { SubmitErrorStateMatcher } from '../../../../errors';
-import { StudentsService } from './students.service';
 import { Observable } from 'rxjs';
 import { AuthService } from '../../../../core/services/auth.service';
+import { select, Store } from '@ngrx/store';
+import { UIActions } from '../../../../store/ui/ui.actions';
+import {
+  selectAllStudents,
+  selectStudentsError,
+  selectStudentsLoading,
+} from './store/students.selectors';
+import { StudentsActions } from './store/students.actions';
+import { selectAuthUser } from '../../../../store/auth/auth.selectors';
 
 @Component({
   selector: 'app-students',
@@ -22,22 +30,25 @@ import { AuthService } from '../../../../core/services/auth.service';
     },
   ],
 })
-export class StudentsComponent {
-  isEditingId: string | null = null;
+export class StudentsComponent implements OnInit {
+  students$: Observable<Student[]>;
+  loading$: Observable<boolean>;
+  error$: Observable<string | null>;
+  authUser$: Observable<User | null>;
+
   studentForm: FormGroup;
   submitted = false;
-  students: Student[] = [];
-  isLoading = false;
-
-  authUser$: Observable<User | null>;
+  isEditingId: string | null = null;
 
   constructor(
     private fb: FormBuilder,
-    private studentService: StudentsService,
-    private authService: AuthService
+    private authService: AuthService,
+    private store: Store
   ) {
-    this.authUser$ = this.authService.authUser$;
-    this.loadStudentsObservable();
+    this.students$ = this.store.pipe(select(selectAllStudents));
+    this.loading$ = this.store.pipe(select(selectStudentsLoading));
+    this.error$ = this.store.pipe(select(selectStudentsError));
+    this.authUser$ = this.store.pipe(select(selectAuthUser));
 
     this.studentForm = this.fb.group({
       firstName: ['', [Validators.required, Validators.minLength(2)]],
@@ -46,19 +57,12 @@ export class StudentsComponent {
     });
   }
 
-  loadStudentsObservable() {
-    this.isLoading = true;
-    this.studentService.getStudents().subscribe({
-      next: (data) => {
-        this.students = data;
-      },
-      error: (error) => {
-        console.error('There was an error loading the students:', error);
-      },
-      complete: () => {
-        this.isLoading = false;
-      },
-    });
+  ngOnInit(): void {
+    setTimeout(() => {
+      this.store.dispatch(UIActions.setToolbarTitle({ title: 'Students' }));
+    }, 0);
+
+    this.store.dispatch(StudentsActions.loadStudents());
   }
 
   get firstName() {
@@ -71,7 +75,7 @@ export class StudentsComponent {
     return this.studentForm.get('email');
   }
 
-  onSubmit() {
+  onSubmit(): void {
     this.submitted = true;
     if (this.studentForm.invalid) {
       this.studentForm.markAllAsTouched();
@@ -80,67 +84,42 @@ export class StudentsComponent {
 
     const formValue = this.studentForm.value;
     if (this.isEditingId) {
-      const updated: Student = {
+      const updatedStudent: Student = {
         id: this.isEditingId,
         ...formValue,
       };
-
-      this.studentService.updateStudent(updated).subscribe({
-        next: (res) => {
-          this.students = this.students.map((s) => (s.id === res.id ? res : s));
-        },
-        error: (err) => {
-          console.error('Error updating student', err);
-        },
-        complete: () => {
-          console.log('Student updated successfully');
-          this.clearForm();
-        },
-      });
+      this.store.dispatch(
+        StudentsActions.updateStudent({ student: updatedStudent })
+      );
     } else {
-      this.studentService.createStudent(formValue).subscribe({
-        next: (res) => {
-          this.students = [...this.students, res];
-        },
-        error: (err) => {
-          console.error('Error creating student', err);
-        },
-        complete: () => {
-          console.log('Student created successfully');
-          this.clearForm();
-        },
-      });
+      const newStudentPayload: Omit<Student, 'id'> = {
+        firstName: formValue.firstName,
+        lastName: formValue.lastName,
+        email: formValue.email,
+      };
+      this.store.dispatch(
+        StudentsActions.createStudent({ student: newStudentPayload })
+      );
     }
+    this.clearForm();
   }
 
-  onEditStudent(student: Student) {
+  onEditStudent(student: Student): void {
     this.isEditingId = student.id;
     this.studentForm.patchValue(student);
   }
 
-  onDeleteStudent(id: string) {
-    if (confirm('Are you sure you want to delete this student?')) {
-      this.studentService.deleteStudent(id.toLocaleString()).subscribe({
-        next: (students) => {
-          this.students = students;
-        },
-        error: (error) => {
-          console.error('Error deleting student', error);
-        },
-        complete: () => {
-          console.log('Student deleted successfully');
-        },
-      });
-    }
+  onDeleteStudent(id: string): void {
+    if (!confirm('¿Estás seguro de eliminar este estudiante?')) return;
+    this.store.dispatch(StudentsActions.deleteStudent({ id }));
   }
 
-  // Clear form by pressing ESC
   @HostListener('window:keydown.escape', ['$event'])
   onEscPressed(event: KeyboardEvent) {
     this.clearForm();
   }
 
-  clearForm() {
+  clearForm(): void {
     this.studentForm.reset();
     this.isEditingId = null;
     this.submitted = false;

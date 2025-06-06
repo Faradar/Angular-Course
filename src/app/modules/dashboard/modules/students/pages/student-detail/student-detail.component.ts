@@ -1,10 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { forkJoin, Observable } from 'rxjs';
+import { combineLatest, filter, map, Observable, take } from 'rxjs';
 import { Course, Enrollment, Student } from '../../../../../../models';
-import { StudentsService } from '../../students.service';
-import { CoursesService } from '../../../courses/courses.service';
-import { EnrollmentsService } from '../../../enrollments/enrollments.service';
+import { select, Store } from '@ngrx/store';
+import { StudentsActions } from '../../store/students.actions';
+import { CoursesActions } from '../../../courses/store/courses.actions';
+import { EnrollmentsActions } from '../../../enrollments/store/enrollments.actions';
+import { selectAllStudents } from '../../store/students.selectors';
+import { selectAllEnrollments } from '../../../enrollments/store/enrollments.selectors';
+import { selectAllCourses } from '../../../courses/store/courses.selectors';
 
 @Component({
   selector: 'app-student-detail',
@@ -13,49 +17,67 @@ import { EnrollmentsService } from '../../../enrollments/enrollments.service';
   styleUrl: './student-detail.component.scss',
 })
 export class StudentDetailComponent implements OnInit {
+  private studentId!: string;
+
   student$!: Observable<Student | null>;
-  enrolledCourses: Course[] = [];
-  private allEnrollments: Enrollment[] = [];
-  loading = true;
+  enrolledCourses$!: Observable<Course[]>;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private studentsSvc: StudentsService,
-    private coursesSvc: CoursesService,
-    private enrollmentsSvc: EnrollmentsService
+    private store: Store
   ) {}
 
   ngOnInit(): void {
-    const id = String(this.route.snapshot.paramMap.get('id'));
-    this.student$ = this.studentsSvc.getStudentById(id);
+    this.studentId = this.route.snapshot.paramMap.get('id')!;
 
-    forkJoin({
-      courses: this.coursesSvc.getCourses(),
-      enrollments: this.enrollmentsSvc.getEnrollments(),
-    }).subscribe(({ courses, enrollments }) => {
-      this.allEnrollments = enrollments;
-      const mine = enrollments.filter((e) => e.studentId === id);
-      this.enrolledCourses = courses.filter((c) =>
-        mine.some((e) => e.courseId === c.id)
-      );
-      this.loading = false;
-    });
+    this.store.dispatch(StudentsActions.loadStudents());
+    this.store.dispatch(CoursesActions.loadCourses());
+    this.store.dispatch(EnrollmentsActions.loadEnrollments());
+
+    this.student$ = this.store.pipe(
+      select(selectAllStudents),
+      map((list) => list.find((s) => s.id === this.studentId) || null)
+    );
+
+    this.enrolledCourses$ = combineLatest([
+      this.store.pipe(select(selectAllEnrollments)),
+      this.store.pipe(select(selectAllCourses)),
+    ]).pipe(
+      map(([enrollments, courses]) => {
+        const myEnrollments: Enrollment[] = enrollments.filter(
+          (e) => e.studentId === this.studentId
+        );
+        return courses.filter((c) =>
+          myEnrollments.some((me) => me.courseId === c.id)
+        );
+      })
+    );
   }
 
   removeEnrollment(courseId: string): void {
-    const id = this.route.snapshot.paramMap.get('id')!;
+    this.store
+      .pipe(
+        select(selectAllEnrollments),
+        take(1),
+        map(
+          (enrollments) =>
+            enrollments.find(
+              (en) =>
+                en.studentId === this.studentId && en.courseId === courseId
+            ) || null
+        ),
+        filter((found): found is Enrollment => found !== null)
+      )
+      .subscribe((foundEnrollment) => {
+        if (!confirm('Remove this enrollment?')) {
+          return;
+        }
 
-    const e = this.allEnrollments.find(
-      (en) => en.studentId === id && en.courseId === courseId
-    );
-    if (!e) return;
-
-    if (!confirm('Remove this enrollment?')) return;
-
-    this.enrollmentsSvc.deleteEnrollment(e.id).subscribe(() => {
-      this.ngOnInit();
-    });
+        this.store.dispatch(
+          EnrollmentsActions.deleteEnrollment({ id: foundEnrollment.id })
+        );
+      });
   }
 
   goBack(): void {

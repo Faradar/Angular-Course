@@ -1,10 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { Course, Enrollment, Student } from '../../../../../../models';
 import { ActivatedRoute, Router } from '@angular/router';
-import { CoursesService } from '../../courses.service';
-import { StudentsService } from '../../../students/students.service';
-import { EnrollmentsService } from '../../../enrollments/enrollments.service';
-import { forkJoin } from 'rxjs';
+import { combineLatest, filter, map, Observable, take } from 'rxjs';
+import { CoursesActions } from '../../store/courses.actions';
+import { StudentsActions } from '../../../students/store/students.actions';
+import { EnrollmentsActions } from '../../../enrollments/store/enrollments.actions';
+import { select, Store } from '@ngrx/store';
+import { selectAllCourses } from '../../store/courses.selectors';
+import { selectAllEnrollments } from '../../../enrollments/store/enrollments.selectors';
+import { selectAllStudents } from '../../../students/store/students.selectors';
 
 @Component({
   selector: 'app-courses-detail',
@@ -13,61 +17,63 @@ import { forkJoin } from 'rxjs';
   styleUrl: './courses-detail.component.scss',
 })
 export class CoursesDetailComponent implements OnInit {
-  course: Course | null = null;
-  enrolledStudents: Student[] = [];
-  private allEnrollments: Enrollment[] = [];
-  loading = true;
-  notFound = false;
+  private courseId!: string;
+
+  course$!: Observable<Course | null>;
+  enrolledStudents$!: Observable<Student[]>;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private coursesSvc: CoursesService,
-    private studentsSvc: StudentsService,
-    private enrollmentsSvc: EnrollmentsService
+    private store: Store
   ) {}
 
   ngOnInit(): void {
-    const courseId = this.route.snapshot.paramMap.get('id')!;
-    // load all three sets at once
-    forkJoin({
-      courses: this.coursesSvc.getCourses(),
-      students: this.studentsSvc.getStudents(),
-      enrollments: this.enrollmentsSvc.getEnrollments(),
-    }).subscribe(({ courses, students, enrollments }) => {
-      this.allEnrollments = enrollments;
-      // find the requested course
-      const found = courses.find((c) => c.id === courseId);
-      if (!found) {
-        this.notFound = true;
-        this.loading = false;
-        return;
-      }
-      this.course = found;
+    this.courseId = this.route.snapshot.paramMap.get('id')!;
 
-      // get enrollments for this course
-      const mine = enrollments.filter((e) => e.courseId === courseId);
-      // map those to Student objects
-      this.enrolledStudents = students.filter((s) =>
-        mine.some((e) => e.studentId === s.id)
-      );
-      this.loading = false;
-    });
+    this.store.dispatch(CoursesActions.loadCourses());
+    this.store.dispatch(StudentsActions.loadStudents());
+    this.store.dispatch(EnrollmentsActions.loadEnrollments());
+
+    this.course$ = this.store.pipe(
+      select(selectAllCourses),
+      map((list) => list.find((c) => c.id === this.courseId) || null)
+    );
+
+    this.enrolledStudents$ = combineLatest([
+      this.store.pipe(select(selectAllEnrollments)),
+      this.store.pipe(select(selectAllStudents)),
+    ]).pipe(
+      map(([enrollments, students]) => {
+        const myEnrollments: Enrollment[] = enrollments.filter(
+          (en) => en.courseId === this.courseId
+        );
+        return students.filter((stu) =>
+          myEnrollments.some((me) => me.studentId === stu.id)
+        );
+      })
+    );
   }
 
   removeStudent(studentId: string): void {
-    if (!confirm('Unenroll this student?')) return;
-
-    const courseId = this.route.snapshot.paramMap.get('id')!;
-    const enrollment = this.allEnrollments.find(
-      (e) => e.courseId === courseId && e.studentId === studentId
-    );
-    if (!enrollment) return;
-
-    this.enrollmentsSvc.deleteEnrollment(enrollment.id).subscribe(() => {
-      // reload after deletion
-      this.ngOnInit();
-    });
+    this.store
+      .pipe(
+        select(selectAllEnrollments),
+        take(1),
+        map(
+          (enrollments) =>
+            enrollments.find(
+              (e) => e.courseId === this.courseId && e.studentId === studentId
+            ) || null
+        ),
+        filter((found): found is Enrollment => found !== null)
+      )
+      .subscribe((foundEnrollment) => {
+        if (!confirm('Unenroll this student?')) return;
+        this.store.dispatch(
+          EnrollmentsActions.deleteEnrollment({ id: foundEnrollment.id })
+        );
+      });
   }
 
   goBack(): void {

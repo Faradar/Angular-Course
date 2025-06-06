@@ -1,22 +1,18 @@
-<ng-container *ngIf="!notFound; else notFoundTpl">
+<ng-container *ngIf="course$ | async as course; else notFoundTpl">
   <mat-card class="p-4">
     <mat-card-header>
-      <mat-card-title>
-        {{ course?.name | titlecase }}
-      </mat-card-title>
-      <mat-card-subtitle>
-        {{ course?.description }}
-      </mat-card-subtitle>
+      <mat-card-title>{{ course.name | titlecase }}</mat-card-title>
+      <mat-card-subtitle>{{ course.description }}</mat-card-subtitle>
     </mat-card-header>
 
     <mat-card-content>
       <h3>Enrolled Students</h3>
 
       <mat-list
-        *ngIf="!loading && enrolledStudents.length; else noStudentsTpl"
+        *ngIf="(enrolledStudents$ | async)?.length; else noStudentsTpl"
         class="centered-enrollments"
       >
-        <mat-list-item *ngFor="let s of enrolledStudents">
+        <mat-list-item *ngFor="let s of enrolledStudents$ | async">
           <div class="student-item">
             <mat-icon matListAvatar>person</mat-icon>
             <span matLine>{{ s | studentFullName | titlecase }}</span>

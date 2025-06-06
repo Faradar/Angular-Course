@@ -3,7 +3,7 @@
 </mat-toolbar>
 
 <div class="p-4">
-  <!-- New Course Button -->
+  <!-- New Course -->
   <div
     *ngIf="(authUser$ | async)?.role === 'admin'"
     class="d-flex justify-content-end mb-3"
@@ -14,20 +14,25 @@
     </button>
   </div>
 
-  <!-- Loading Spinner -->
-  <div class="d-flex justify-content-center" *ngIf="loading">
+  <!-- Loading -->
+  <div class="d-flex justify-content-center" *ngIf="loading$ | async">
     <mat-progress-spinner
       diameter="40"
       mode="indeterminate"
     ></mat-progress-spinner>
   </div>
 
+  <!-- Error -->
+  <div *ngIf="error$ | async as errMsg" class="text-danger mb-3">
+    Error loading courses: {{ errMsg }}
+  </div>
+
   <!-- Courses Table -->
   <table
     mat-table
-    [dataSource]="courses"
+    [dataSource]="(courses$ | async) || []"
     class="mat-elevation-z8 w-100"
-    *ngIf="!loading"
+    *ngIf="!(loading$ | async) && !(error$ | async)"
   >
     <!-- ID Column -->
     <ng-container matColumnDef="id">

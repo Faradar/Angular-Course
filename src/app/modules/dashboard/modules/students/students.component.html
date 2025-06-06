@@ -1,29 +1,23 @@
 <h1 appHighlight>Students</h1>
 
-<ng-container *ngIf="isLoading; else notLoading">
-  <p>Cargando...</p>
+<ng-container *ngIf="loading$ | async; else showFormAndTable">
+  <p>Loading...</p>
 </ng-container>
 
-<ng-template #notLoading>
+<ng-template #showFormAndTable>
+  <!-- Form -->
   <form
     *ngIf="(authUser$ | async)?.role === 'admin'"
     [formGroup]="studentForm"
     class="w-100"
     (ngSubmit)="onSubmit()"
   >
-    <mat-chip-set
-      *ngIf="isEditingId"
-      [attr.aria-label]="'Editing student with ID ' + isEditingId"
-      role="status"
-      aria-live="polite"
-    >
-      <mat-chip>Editing student with ID: {{ isEditingId }}</mat-chip>
-    </mat-chip-set>
     <div class="row">
+      <!-- First Name -->
       <div class="col-4">
         <mat-form-field class="w-100">
           <mat-label>First Name</mat-label>
-          <input formControlName="firstName" matInput class="w-100" />
+          <input formControlName="firstName" matInput />
           <mat-error *ngIf="firstName?.hasError('required') && submitted">
             First name is required
           </mat-error>
@@ -32,51 +26,56 @@
           </mat-error>
         </mat-form-field>
       </div>
+
+      <!-- Last Name -->
       <div class="col-4">
         <mat-form-field class="w-100">
           <mat-label>Last Name</mat-label>
-          <input formControlName="lastName" matInput class="w-100" />
-          <mat-error
-            *ngIf="
-              lastName?.hasError('required') && lastName?.touched && submitted
-            "
-          >
+          <input formControlName="lastName" matInput />
+          <mat-error *ngIf="lastName?.hasError('required') && submitted">
             Last name is required
           </mat-error>
-          <mat-error
-            *ngIf="
-              lastName?.hasError('minlength') && lastName?.touched && submitted
-            "
-          >
+          <mat-error *ngIf="lastName?.hasError('minlength') && submitted">
             Minimum 2 characters
-          </mat-error></mat-form-field
-        >
+          </mat-error>
+        </mat-form-field>
       </div>
+
+      <!-- Email -->
       <div class="col-4">
         <mat-form-field class="w-100">
           <mat-label>Email</mat-label>
-          <input formControlName="email" matInput class="w-100" />
-          <mat-error
-            *ngIf="email?.hasError('required') && email?.touched && submitted"
-          >
+          <input formControlName="email" matInput />
+          <mat-error *ngIf="email?.hasError('required') && submitted">
             Email is required
           </mat-error>
-          <mat-error
-            *ngIf="email?.hasError('email') && email?.touched && submitted"
-          >
+          <mat-error *ngIf="email?.hasError('email') && submitted">
             Invalid email format
-          </mat-error></mat-form-field
-        >
+          </mat-error>
+        </mat-form-field>
       </div>
+
+      <!-- Submit -->
       <div class="col-12 d-flex justify-content-end mt-3">
         <button mat-flat-button type="submit">Save</button>
       </div>
     </div>
   </form>
 
+  <!-- Students Table -->
   <app-students-table
+    *ngIf="students$ | async as studentsList"
+    [dataSource]="studentsList"
     (editStudent)="onEditStudent($event)"
     (deleteStudent)="onDeleteStudent($event.toString())"
-    [dataSource]="students"
-  />
+  ></app-students-table>
+
+  <!-- Error -->
+  <div
+    *ngIf="error$ | async as errMsg"
+    class="text-danger"
+    style="margin-top: 1rem"
+  >
+    Error: {{ errMsg }}
+  </div>
 </ng-template>

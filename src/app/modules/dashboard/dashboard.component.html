@@ -9,7 +9,7 @@
     >
       <mat-icon>menu</mat-icon>
     </button>
-    <span>My App</span>
+    <span>{{ toolbarTitle$ | async }}</span>
     <span class="example-spacer"></span>
     <button
       mat-icon-button
@@ -25,8 +25,9 @@
     >
       <mat-icon>share</mat-icon>
     </button>
-    <div *ngIf="authUser$ | async; let user">
-      {{ user.username + " - " + user.role }}
+
+    <div *ngIf="authUser$ | async as user" class="user-info">
+      {{ user.username }} - {{ user.role }}
     </div>
   </mat-toolbar>
 

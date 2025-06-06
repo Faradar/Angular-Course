@@ -1,7 +1,9 @@
 import { Component } from '@angular/core';
 import { Observable } from 'rxjs';
 import { User } from '../../models';
-import { AuthService } from '../../core/services/auth.service';
+import { select, Store } from '@ngrx/store';
+import { selectAuthUser } from '../../store/auth/auth.selectors';
+import { selectToolbarTitle } from '../../store/ui/ui.selectors';
 
 @Component({
   selector: 'app-dashboard',
@@ -13,8 +15,10 @@ export class DashboardComponent {
   showFiller = false;
 
   authUser$: Observable<User | null>;
+  toolbarTitle$: Observable<string>;
 
-  constructor(private authService: AuthService) {
-    this.authUser$ = this.authService.authUser$;
+  constructor(private store: Store) {
+    this.authUser$ = this.store.pipe(select(selectAuthUser));
+    this.toolbarTitle$ = this.store.pipe(select(selectToolbarTitle));
   }
 }

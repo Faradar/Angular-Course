@@ -7,24 +7,34 @@
 
 <div class="p-4">
   <!-- Loading -->
-  <div class="d-flex justify-content-center" *ngIf="loading">
+  <div class="d-flex justify-content-center" *ngIf="loading$ | async">
     <mat-progress-spinner
       diameter="40"
       mode="indeterminate"
     ></mat-progress-spinner>
   </div>
 
+  <!-- Error -->
+  <div
+    *ngIf="error$ | async as errMsg"
+    class="mat-body-1 text-danger"
+    style="margin-bottom: 1rem"
+  >
+    Error: {{ errMsg }}
+  </div>
+
   <!-- Not Found -->
-  <p *ngIf="!loading && notFound" class="mat-body-1 mat-warn">
+  <p *ngIf="!(loading$ | async) && notFound" class="mat-body-1 mat-warn">
     Enrollment not found.
   </p>
 
   <!-- Form -->
   <form
-    *ngIf="!loading && !notFound"
+    *ngIf="!(loading$ | async) && !notFound"
     [formGroup]="form"
     (ngSubmit)="onSubmit()"
   >
+    <!-- Student Select -->
     <mat-form-field class="w-100">
       <mat-label>Student</mat-label>
       <mat-select formControlName="studentId">
@@ -37,6 +47,7 @@
       </mat-error>
     </mat-form-field>
 
+    <!-- Course Select -->
     <mat-form-field class="w-100">
       <mat-label>Course</mat-label>
       <mat-select formControlName="courseId">
@@ -53,6 +64,7 @@
       </mat-error>
     </mat-form-field>
 
+    <!-- Enrollment Date -->
     <mat-form-field class="w-100">
       <mat-label>Enrollment Date</mat-label>
       <input
@@ -67,6 +79,7 @@
       </mat-error>
     </mat-form-field>
 
+    <!-- Buttons -->
     <div class="d-flex justify-content-end mt-3">
       <button mat-stroked-button type="button" (click)="onCancel()">
         Cancel

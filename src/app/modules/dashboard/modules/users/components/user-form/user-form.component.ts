@@ -1,8 +1,21 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+  AbstractControl,
+  FormBuilder,
+  FormGroup,
+  Validators,
+} from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { UsersService } from '../../users.service';
 import { User } from '../../../../../../models';
+import { filter, map, Observable, take } from 'rxjs';
+import { select, Store } from '@ngrx/store';
+import {
+  selectAllUsers,
+  selectUsersError,
+  selectUsersLoading,
+} from '../../store/users.selectors';
+import { UIActions } from '../../../../../../store/ui/ui.actions';
+import { UsersActions } from '../../store/users.actions';
 
 @Component({
   selector: 'app-user-form',
@@ -13,41 +26,80 @@ import { User } from '../../../../../../models';
 export class UserFormComponent implements OnInit {
   form!: FormGroup;
   editId: string | null = null;
-  loading = false;
-  notFound = false;
+
+  loading$: Observable<boolean>;
+  error$: Observable<string | null>;
+  allUsers$: Observable<User[]>;
+
+  private originalPassword: string = '';
 
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
-    private usersSvc: UsersService
-  ) {}
-
-  ngOnInit(): void {
+    private store: Store
+  ) {
     this.form = this.fb.group({
       username: ['', [Validators.required, Validators.minLength(2)]],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
+      password: ['', [Validators.minLength(6)]],
       role: ['user', Validators.required],
+      token: [''],
     });
 
-    const idParam = this.route.snapshot.paramMap.get('id');
-    if (idParam) {
-      this.editId = idParam;
-      this.loading = true;
-      this.usersSvc.getUserById(idParam).subscribe((u) => {
-        if (!u) {
-          this.notFound = true;
-        } else {
-          this.form.patchValue({
-            username: u.username,
-            email: u.email,
-            role: u.role,
-          });
-        }
-        this.loading = false;
-      });
+    this.loading$ = this.store.pipe(select(selectUsersLoading));
+    this.error$ = this.store.pipe(select(selectUsersError));
+    this.allUsers$ = this.store.pipe(select(selectAllUsers));
+  }
+
+  ngOnInit(): void {
+    const routeId = this.route.snapshot.paramMap.get('id');
+    const isEdit = !!routeId;
+    this.editId = routeId;
+
+    setTimeout(() => {
+      const title = isEdit ? 'Edit User' : 'New User';
+      this.store.dispatch(UIActions.setToolbarTitle({ title }));
+    }, 0);
+
+    this.store.dispatch(UsersActions.loadUsers());
+
+    if (isEdit && routeId) {
+      this.allUsers$
+        .pipe(
+          filter((users) => users.length > 0),
+          take(1),
+          map((users) => users.find((u) => u.id === routeId))
+        )
+        .subscribe((user) => {
+          if (user) {
+            this.originalPassword = user.password;
+
+            this.form.patchValue({
+              username: user.username,
+              email: user.email,
+              role: user.role,
+              token: user.token,
+            });
+            this.passwordControl.clearValidators();
+            this.passwordControl.setValidators([Validators.minLength(6)]);
+            this.passwordControl.updateValueAndValidity();
+          } else {
+            alert('User not found');
+            this.router.navigate(['/dashboard/users']);
+          }
+        });
+    } else {
+      this.passwordControl.setValidators([
+        Validators.required,
+        Validators.minLength(6),
+      ]);
+      this.passwordControl.updateValueAndValidity();
     }
+  }
+
+  private get passwordControl(): AbstractControl {
+    return this.form.get('password')!;
   }
 
   private generateToken(): string {
@@ -60,20 +112,33 @@ export class UserFormComponent implements OnInit {
       return;
     }
 
-    const payload: User = {
-      ...this.form.value,
-      token: this.editId ? this.form.value.token : this.generateToken(),
-    } as User;
+    const formValue = this.form.value;
 
     if (this.editId) {
-      payload.id = this.editId;
-      this.usersSvc
-        .updateUser(payload)
-        .subscribe(() => this.router.navigate(['/dashboard/users']));
+      const finalPassword = formValue.password
+        ? formValue.password
+        : this.originalPassword;
+
+      const updatedUser: User = {
+        id: this.editId,
+        username: formValue.username,
+        email: formValue.email,
+        password: finalPassword,
+        role: formValue.role,
+        token: formValue.token,
+      };
+      this.store.dispatch(UsersActions.updateUser({ user: updatedUser }));
+      this.router.navigate(['/dashboard/users']);
     } else {
-      this.usersSvc
-        .createUser(payload)
-        .subscribe(() => this.router.navigate(['/dashboard/users']));
+      const newUserPayload: Omit<User, 'id'> = {
+        username: formValue.username,
+        email: formValue.email,
+        password: formValue.password,
+        role: formValue.role,
+        token: this.generateToken(),
+      };
+      this.store.dispatch(UsersActions.createUser({ user: newUserPayload }));
+      this.router.navigate(['/dashboard/users']);
     }
   }
 

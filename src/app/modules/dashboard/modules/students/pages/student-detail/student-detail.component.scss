@@ -1,18 +1,18 @@
 mat-card-header {
-  margin-bottom: 24px; /* space between header (name/email) and content */
+  margin-bottom: 24px;
 }
 
 mat-card-content {
   h3 {
     margin-top: 0;
-    margin-bottom: 16px; /* space between “Enrolled Courses” title and list */
+    margin-bottom: 16px;
   }
 }
 
 mat-list-item {
   padding-top: 4px;
   padding-bottom: 4px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.12); /* subtle separator */
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
 }
 
 mat-icon[matListAvatar] {
@@ -24,5 +24,5 @@ mat-icon[matListAvatar] {
 .course-item {
   display: flex;
   align-items: center;
-  max-width: 210px;
+  max-width: 250px;
 }

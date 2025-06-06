@@ -2,10 +2,17 @@ import { Component, OnInit } from '@angular/core';
 import { Course, Enrollment, Student } from '../../../../../../models';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { EnrollmentsService } from '../../enrollments.service';
 import { CoursesService } from '../../../courses/courses.service';
 import { StudentsService } from '../../../students/students.service';
-import { forkJoin } from 'rxjs';
+import { forkJoin, Observable, take } from 'rxjs';
+import { select, Store } from '@ngrx/store';
+import { UIActions } from '../../../../../../store/ui/ui.actions';
+import {
+  selectAllEnrollments,
+  selectEnrollmentsError,
+  selectEnrollmentsLoading,
+} from '../../store/enrollments.selectors';
+import { EnrollmentsActions } from '../../store/enrollments.actions';
 
 @Component({
   selector: 'app-enrollment-form',
@@ -16,11 +23,13 @@ import { forkJoin } from 'rxjs';
 export class EnrollmentFormComponent implements OnInit {
   form!: FormGroup;
   editId: string | null = null;
-  loading = false;
 
   students: Student[] = [];
   courses: Course[] = [];
-  enrollments: Enrollment[] = [];
+  allEnrollments: Enrollment[] = [];
+
+  loading$: Observable<boolean>;
+  error$: Observable<string | null>;
 
   notFound = false;
 
@@ -28,43 +37,52 @@ export class EnrollmentFormComponent implements OnInit {
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
-    private svc: EnrollmentsService,
-    private coursesSvc: CoursesService,
-    private studentsSvc: StudentsService
-  ) {}
+    private store: Store,
+    private studentsSvc: StudentsService,
+    private coursesSvc: CoursesService
+  ) {
+    this.loading$ = this.store.pipe(select(selectEnrollmentsLoading));
+    this.error$ = this.store.pipe(select(selectEnrollmentsError));
+  }
 
   ngOnInit(): void {
+    const idParam = this.route.snapshot.paramMap.get('id');
+    const isEdit = !!this.route.snapshot.paramMap.get('id');
+    const title = isEdit ? 'Edit Enrollment' : 'New Enrollment';
+    setTimeout(() => {
+      this.store.dispatch(UIActions.setToolbarTitle({ title }));
+    }, 0);
+
     this.form = this.fb.group({
       studentId: [null, Validators.required],
       courseId: [null, Validators.required],
       enrollmentDate: [new Date(), Validators.required],
     });
 
-    this.loading = true;
+    this.store.dispatch(EnrollmentsActions.loadEnrollments());
+
     forkJoin({
       students: this.studentsSvc.getStudents(),
       courses: this.coursesSvc.getCourses(),
-      enrollments: this.svc.getEnrollments(),
-    }).subscribe(({ students, courses, enrollments }) => {
+    }).subscribe(({ students, courses }) => {
       this.students = students;
       this.courses = courses;
-      this.enrollments = enrollments;
-      this.loading = false;
+    });
 
-      const idParam = this.route.snapshot.paramMap.get('id');
+    this.store.pipe(select(selectAllEnrollments), take(1)).subscribe((list) => {
+      this.allEnrollments = list;
+
       if (idParam) {
         this.editId = idParam;
-        this.svc.getEnrollmentById(idParam).subscribe((e) => {
-          if (!e) {
-            this.notFound = true;
-            console.error('Enrollment not found');
-            return;
-          }
-          this.form.patchValue({
-            studentId: e.studentId,
-            courseId: e.courseId,
-            enrollmentDate: new Date(e.enrollmentDate),
-          });
+        const existing = list.find((e) => e.id === idParam);
+        if (!existing) {
+          this.notFound = true;
+          return;
+        }
+        this.form.patchValue({
+          studentId: existing.studentId,
+          courseId: existing.courseId,
+          enrollmentDate: new Date(existing.enrollmentDate),
         });
       }
     });
@@ -78,8 +96,9 @@ export class EnrollmentFormComponent implements OnInit {
     const sid = this.form.get('studentId')?.value;
     if (!sid) return false;
 
-    return this.enrollments.some(
-      (e) => e.studentId === sid && e.courseId === courseId
+    return this.allEnrollments.some(
+      (e) =>
+        e.studentId === sid && e.courseId === courseId && e.id !== this.editId
     );
   }
 
@@ -88,14 +107,29 @@ export class EnrollmentFormComponent implements OnInit {
       this.form.markAllAsTouched();
       return;
     }
-    const payload: Enrollment = {
-      ...this.form.value,
-    } as Enrollment;
-    const op$ = this.editId
-      ? this.svc.updateEnrollment(payload)
-      : this.svc.createEnrollment(payload);
 
-    op$.subscribe(() => this.router.navigate(['/dashboard/enrollments']));
+    const formValue = this.form.value;
+    if (this.editId) {
+      const updated: Enrollment = {
+        id: this.editId,
+        studentId: formValue.studentId,
+        courseId: formValue.courseId,
+        enrollmentDate: formValue.enrollmentDate,
+      };
+      this.store.dispatch(
+        EnrollmentsActions.updateEnrollment({ enrollment: updated })
+      );
+    } else {
+      const newPayload: Omit<Enrollment, 'id'> = {
+        studentId: formValue.studentId,
+        courseId: formValue.courseId,
+        enrollmentDate: formValue.enrollmentDate,
+      };
+      this.store.dispatch(
+        EnrollmentsActions.createEnrollment({ enrollment: newPayload })
+      );
+    }
+    this.router.navigate(['/dashboard/enrollments']);
   }
 
   onCancel(): void {

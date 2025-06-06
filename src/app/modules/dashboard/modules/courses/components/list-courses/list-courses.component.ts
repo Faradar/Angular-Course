@@ -1,9 +1,17 @@
 import { Component, OnInit } from '@angular/core';
 import { Course, User } from '../../../../../../models';
-import { CoursesService } from '../../courses.service';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { AuthService } from '../../../../../../core/services/auth.service';
+import { select, Store } from '@ngrx/store';
+import { UIActions } from '../../../../../../store/ui/ui.actions';
+import {
+  selectAllCourses,
+  selectCoursesError,
+  selectCoursesLoading,
+} from '../../store/courses.selectors';
+import { selectAuthUser } from '../../../../../../store/auth/auth.selectors';
+import { CoursesActions } from '../../store/courses.actions';
 
 @Component({
   selector: 'app-list-courses',
@@ -12,8 +20,10 @@ import { AuthService } from '../../../../../../core/services/auth.service';
   styleUrl: './list-courses.component.scss',
 })
 export class ListCoursesComponent implements OnInit {
-  courses: Course[] = [];
-  loading = false;
+  courses$: Observable<Course[]>;
+  loading$: Observable<boolean>;
+  error$: Observable<string | null>;
+
   displayedColumns: string[] = [
     'id',
     'name',
@@ -25,29 +35,22 @@ export class ListCoursesComponent implements OnInit {
   authUser$: Observable<User | null>;
 
   constructor(
-    private svc: CoursesService,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private store: Store
   ) {
-    this.authUser$ = this.authService.authUser$;
+    this.courses$ = this.store.pipe(select(selectAllCourses));
+    this.loading$ = this.store.pipe(select(selectCoursesLoading));
+    this.error$ = this.store.pipe(select(selectCoursesError));
+    this.authUser$ = this.store.pipe(select(selectAuthUser));
   }
 
   ngOnInit(): void {
-    this.fetchCourses();
-  }
+    setTimeout(() => {
+      this.store.dispatch(UIActions.setToolbarTitle({ title: 'Courses' }));
+    }, 0);
 
-  private fetchCourses(): void {
-    this.loading = true;
-    this.svc.getCourses().subscribe({
-      next: (data) => {
-        this.courses = data;
-        this.loading = false;
-      },
-      error: (err) => {
-        console.error('Error loading courses', err);
-        this.loading = false;
-      },
-    });
+    this.store.dispatch(CoursesActions.loadCourses());
   }
 
   onNew(): void {
@@ -59,12 +62,9 @@ export class ListCoursesComponent implements OnInit {
   }
 
   onDelete(id: string): void {
-    if (!confirm('Delete this course?')) {
+    if (!confirm('Are you sure you want to delete this course?')) {
       return;
     }
-    this.svc.deleteCourse(id).subscribe({
-      next: () => this.fetchCourses(),
-      error: (err) => console.error('Delete failed', err),
-    });
+    this.store.dispatch(CoursesActions.deleteCourse({ id }));
   }
 }

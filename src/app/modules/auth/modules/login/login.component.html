@@ -15,6 +15,15 @@
         <input formControlName="password" matInput type="password" />
       </mat-form-field>
 
+      <!-- Error -->
+      <div
+        *ngIf="authError$ | async as errorMsg"
+        class="col-12"
+        style="color: red; margin-bottom: 1rem"
+      >
+        {{ errorMsg }}
+      </div>
+
       <div class="col-12 d-flex justify-content-end">
         <button mat-raised-button color="primary" type="submit">Login</button>
         <button
